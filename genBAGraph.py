@@ -10,8 +10,7 @@
 # per Barabasi minK = numero di archi uscenti da un nodo
 # BarabasiAlbertGraph File:             BarabasiAlbertGraphs/BAG_x.TabOne
 # BarabasiAlbertGraph MissingEdge File: BarabasiAlbertGraphs/missingEdgeForBAG_x.json
-import networkit, pandas, time, sys, logging
-import utility
+import networkit, pandas, time, sys, logging, utility
 
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("genBAGraph")
@@ -67,7 +66,7 @@ def genAndStoreSingleBAG(nMax, k, index):
 
     start_missing = time.time()
     saveSingleBAG_MissingEdges(index, random_weighted_bag)
-    
+
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"missingEdge_ {index} saved in {time.time() - start_missing}")
 

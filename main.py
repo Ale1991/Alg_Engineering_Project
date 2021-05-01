@@ -3,12 +3,6 @@ from networkit import dynamic
 from pandas.core.indexes.base import Index
 from genBAGraph import MAX_EDGE_WEIGHT, MIN_EDGE_WEIGHT
 import logging, time, numpy, math, random, networkit, graphParser, copy, sys
-import matplotlib.pyplot as plt
-import matplotlib.collections as mcol
-from matplotlib.legend_handler import HandlerLineCollection, HandlerTuple
-from matplotlib.lines import Line2D
-from networkx.drawing.nx_pylab import draw
-from numpy.core.fromnumeric import sort
 import timeit
 import genBAGraph
 
@@ -107,7 +101,7 @@ def DijkstraWithRandomEventTest(graph, event_number, missing_edge_to_add):
         
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"edge_addition_counter: {edge_addition_counter}")
-            
+
         # scelgo randomicamente uno dei 4 eventi tra EDGE_ADDITION, EDGE_REMOVAL, EDGE_WEIGHT_INCREMENT, EDGE_WEIGHT_UPDATE
         event = getRandomGraphEdgeEvent()
 

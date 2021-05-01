@@ -10,8 +10,7 @@
 # per Erdos minProb = probabilita' dell' esistenza di ogni arco
 # ErdosRenyiGraph File:                 ErdosRenyiGraphs/ERG_x.TabOne
 # ErdosRenyiGraph MissingEdge File:     ErdosRenyiGraphs/missingEdgeForERG_x.json
-import networkit, pandas, time
-import genBAGraph, utility, sys, logging
+import networkit, pandas, time, sys, logging, utility
 
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("genERGraph")
@@ -65,7 +64,7 @@ def genAndStoreSingleErdosRenyiGraph(nMax, prob, index):
 
     start_missing = time.time()
     saveSingleERG_MissingEdges(index, random_weighted_erg)
-    
+
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"missingEdge_{index} saved in {time.time() - start_missing}")
 

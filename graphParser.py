@@ -1,4 +1,4 @@
-import os, networkit, pandas, logging, sys
+import networkit, pandas, sys, logging, os
 
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("graphParser")
@@ -115,7 +115,7 @@ def test_getNextERG():
     
     while(True):
         response = parser.getNextERG()
-        
+
         if(response == "no_more_graphs" or response == "not_exist"):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f"break: {response}")
