@@ -1,21 +1,27 @@
-import pandas, numpy, os
+import pandas, numpy, os, sys, logging, utility
 import matplotlib.pyplot as plt
 import matplotlib.collections as mcol
 from matplotlib.legend_handler import HandlerLineCollection, HandlerTuple
 from matplotlib.lines import Line2D
 from numpy.core.fromnumeric import sort
 
+logging.basicConfig(stream=sys.stderr)
+logger = logging.getLogger("plotResult")
+logger.setLevel(logging.DEBUG)
 
 from enum import Enum
+# BarabasiAlbertGraph, ErdosRenyiGraph
 class GraphTypes(Enum):
     BAG = 1
     ERG = 2
+
     def Name(self):
         return self.name
 
 class DijkstraAlgoTypes(Enum):
     STATIC = 1
     DYNAMIC = 2
+    
     def Name(self):
         return self.name
 
@@ -23,10 +29,8 @@ STATIC_RESULT_FOLDER = "Result/Static"
 DYNAMIC_RESULT_FOLDER = "Result/Dynamic"
 FILE_TYPE = ".json"
 
-# BarabasiAlbertGraph, ErdosRenyiGraph
-GRAPH_TYPES = ["BAG", "ERG"]
-
 GRAPH_TO_CHECK = 6
+
 # e'  il numero di eventi randomici che avvengono ad ogni esperimento di dijkstra (per ogni grafo)
 EVENT_NUMBER_IN_EXP = 1999
 
@@ -46,9 +50,6 @@ def saveStaticResult(map):
     df = pandas.DataFrame([map])
     pandas.DataFrame.to_json(df, f"Result/Static/{graph_type}_{graph_number}.json", indent=4, orient='records')
 
-    # dic = pandas.read_json('Result/ERG_0.json')
-    # print("read")
-
 def saveDynamicResult(map):
     # tipo del grafo, es: generati da BarabasiAlbert -> BAG, generati da ErdosRenyi -> ERG
     graph_type = map['graph_type']
@@ -65,11 +66,8 @@ def saveDynamicResult(map):
     df = pandas.DataFrame([map])
     pandas.DataFrame.to_json(df, f"Result/Dynamic/{graph_type}_{graph_number}.json", indent=4, orient='records')
 
-    # dic = pandas.read_json('Result/ERG_0.json')
-    # print("read")
-
 # algo_type = static/dynamic
-# type = GRAPH_TYPES
+# type = GraphTypes
 # index = graph number
 def readResultFromFile(algo_type, graph_type, index):
     folder = ""
@@ -519,7 +517,9 @@ def plotAll(map_result_by_node, dyn_map_result_by_node, map_result_by_edge,dyn_m
     plotNodeSpeedUp(map_result_by_node, dyn_map_result_by_node)
 
     plt.show()
-    print("Test end")
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Test end")
 
 if __name__ == "__main__":
     # PROJECT GOAL
@@ -580,12 +580,15 @@ if __name__ == "__main__":
 
         len_counter += len(dynamic_result_list)
         if(len(avg_SpeedUp) == len_counter):
-            print(f"ok for G{index}")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"ok for G{index}")
         else:
-            print(f"something went wrong for G{index}")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"something went wrong for G{index}")
 
         
 
     # plotAllSpeedUp(avg_SpeedUp)
     plotAvgSpeedUp(avg_SpeedUp)
-    print('finish')
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug('finish')

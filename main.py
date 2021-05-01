@@ -2,7 +2,7 @@ from pickle import TRUE
 from networkit import dynamic
 from pandas.core.indexes.base import Index
 from genBAGraph import MAX_EDGE_WEIGHT, MIN_EDGE_WEIGHT
-import logging, time, numpy, math, random, networkit, graphParser, copy
+import logging, time, numpy, math, random, networkit, graphParser, copy, sys
 import matplotlib.pyplot as plt
 import matplotlib.collections as mcol
 from matplotlib.legend_handler import HandlerLineCollection, HandlerTuple
@@ -11,7 +11,10 @@ from networkx.drawing.nx_pylab import draw
 from numpy.core.fromnumeric import sort
 import timeit
 import genBAGraph
-logging.basicConfig(filename='staticDijkstra_test.log', level=logging.DEBUG)
+
+logging.basicConfig(stream=sys.stderr)
+logger = logging.getLogger("main")
+logger.setLevel(logging.DEBUG)
 
 COMPUTE_FIRST_ALGO_RUN = False
 COMPUTE_PROCESS_TIME = False
@@ -43,7 +46,8 @@ def computeDijkstra(sssp):
         sssp.run()
         return (time.process_time() - start_time)
     else:
-        print("logic error")
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("logic error")
 
 # return CPU/Process time
 def computeDynDijkstra(dynDijkstra, event):
@@ -66,7 +70,8 @@ def computeDynDijkstra(dynDijkstra, event):
             dynDijkstra.run()
             return (time.process_time() - start_time)
     else:
-        print("logic error")
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("logic error")
 
 def DijkstraWithRandomEventTest(graph, event_number, missing_edge_to_add):
     # Dijkstra’s SSSP algorithm
@@ -99,7 +104,10 @@ def DijkstraWithRandomEventTest(graph, event_number, missing_edge_to_add):
     edge_addition_counter = 1
     
     for i in range(event_number):
-        print(edge_addition_counter)
+        
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"edge_addition_counter: {edge_addition_counter}")
+            
         # scelgo randomicamente uno dei 4 eventi tra EDGE_ADDITION, EDGE_REMOVAL, EDGE_WEIGHT_INCREMENT, EDGE_WEIGHT_UPDATE
         event = getRandomGraphEdgeEvent()
 
@@ -189,8 +197,11 @@ def handleEdgeRemovalEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, sta
     assert localGraph.weight(from_node, to_node) == dyn_localGraph.weight(from_node, to_node)
     # controllo che i cammini minimi siano uguali 
     assert dynSssp.distance(to_node) == sssp.distance(to_node)
+
     if(dynSssp.distance(to_node) != sssp.distance(to_node)):
-        print(f"{dynSssp.distance(to_node)} != {sssp.distance(to_node)}")
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"assert error: dynSssp.distance != sssp.distance")
+
     # controllo che il peso totale dei due grafi sia uguale
     assert localGraph.totalEdgeWeight() == dyn_localGraph.totalEdgeWeight()
     # se i path son diversi e' sufficiente che abbiano la stessa distanza
@@ -275,7 +286,8 @@ def test_Dijkstra_on_BAGs():
         response = parser.getNextBAG()
 
         if(response[0] == "no_more_graphs" or response == "not_exist"):
-            print(f"break: {response}")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"break: {response}")
             break
         elif(isinstance(response[0], int) and response[0] <= GRAPH_TO_CHECK - 1):
             index, graph, randomMissingEdgeList = response
@@ -341,7 +353,8 @@ def test_Dijkstra_on_ERGs():
         response = parser.getNextERG()
 
         if(response[0] == "no_more_graphs" or response == "not_exist"):
-            print(f"break: {response}")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"break: {response}")
             break
         elif(isinstance(response[0], int) and response[0] <= GRAPH_TO_CHECK - 1):
             index, graph, randomMissingEdgeList = response
@@ -413,9 +426,6 @@ def saveStaticResult(map):
     df = pandas.DataFrame([map])
     pandas.DataFrame.to_json(df, f"Result/Static/{graph_type}_{graph_number}.json", indent=4, orient='records')
 
-    # dic = pandas.read_json('Result/ERG_0.json')
-    # print("read")
-
 def saveDynamicResult(map):
     import pandas
 
@@ -433,9 +443,6 @@ def saveDynamicResult(map):
     # columns=['graph_type', 'graph_number', 'nodes', 'edges', 'result_list']
     df = pandas.DataFrame([map])
     pandas.DataFrame.to_json(df, f"Result/Dynamic/{graph_type}_{graph_number}.json", indent=4, orient='records')
-
-    # dic = pandas.read_json('Result/ERG_0.json')
-    # print("read")
 
 
 if __name__ == "__main__":

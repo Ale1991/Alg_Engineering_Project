@@ -1,4 +1,8 @@
-import os, networkit, pandas
+import os, networkit, pandas, logging, sys
+
+logging.basicConfig(stream=sys.stderr)
+logger = logging.getLogger("graphParser")
+logger.setLevel(logging.DEBUG)
 
 class file_Parser:
     BAG_folder = "BarabasiAlbertGraphs/"
@@ -95,35 +99,34 @@ def test_getNextBAG():
     
     while(True):
         response = parser.getNextBAG()
+
         if(response == "no_more_graphs" or response == "not_exist"):
-            print(f"break: {response}")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"break: {response}")
             break
         else:
-            asd = response[2].index
-            print(response[0])
+            _index = response[2].index
 
-    print(" end")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"test_getNextBAG: {response[0]}")
 
 def test_getNextERG():
     parser = file_Parser()
     
     while(True):
         response = parser.getNextERG()
+        
         if(response == "no_more_graphs" or response == "not_exist"):
-            print(f"break: {response}")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"break: {response}")
             break
         else:
-            asd =  response[2].index
-            print(f"index: {response[0]}, len(){len(response[2].index)}")
-
-    print(" end")
+            _index =  response[2].index
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"index: {response[0]}, len(){len(response[2].index)}")
 
 if __name__ == "__main__":
     # parser = file_Parser()
-    # print(parser.BAGs_file_path)
-    # print(parser.BAGs_missing_edges_file_path)
-    # print(parser.ERGs_file_path)
-    # print(parser.ERGs_missing_edges_file_path)
     # test_getNextBAG()
     # test_getNextERG()
     pass

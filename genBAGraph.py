@@ -10,8 +10,12 @@
 # per Barabasi minK = numero di archi uscenti da un nodo
 # BarabasiAlbertGraph File:             BarabasiAlbertGraphs/BAG_x.TabOne
 # BarabasiAlbertGraph MissingEdge File: BarabasiAlbertGraphs/missingEdgeForBAG_x.json
-import networkit, pandas, time
+import networkit, pandas, time, sys, logging
 import utility
+
+logging.basicConfig(stream=sys.stderr)
+logger = logging.getLogger("genBAGraph")
+logger.setLevel(logging.DEBUG)
 
 N_GRAPH = utility.N_GRAPH # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
 MIN_NODES = utility.MIN_NODES # minimum Number of nodes in the graph
@@ -30,13 +34,14 @@ def saveSingleBAG_MissingEdges(counter, graph):
     edges = graph.numberOfEdges()
     max_edges =  (nodes * (nodes - 1) / 2) 
 
-    print(f"G=({nodes},{edges}), max_edges: {max_edges} edge_to_compute: {FIXED_EDGE_NUMBER}")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"G=({nodes},{edges}), max_edges: {max_edges} edge_to_compute: {FIXED_EDGE_NUMBER}")
     missingEdges = utility.getMissingEdgeRandomlyFromGraph(graph, FIXED_EDGE_NUMBER, MIN_EDGE_WEIGHT, MAX_EDGE_WEIGHT)
     
     assert edges + len(missingEdges) <= max_edges
     df = pandas.DataFrame(missingEdges, columns =['from_node', 'to_node', 'weight'])
     pandas.DataFrame.to_json(df, f"BarabasiAlbertGraphs/missingEdgeForBAG_{counter}.json", indent=4)
-    
+
 # genero grafo, salvo grafo, calcolo missingEdge e salvo missingEdge
 def genAndStoreSingleBAG(nMax, k, index):
     # BarabasiAlbertGenerator(count k, count nMax, count n0 = 0, bool batagelj = true)
@@ -56,11 +61,15 @@ def genAndStoreSingleBAG(nMax, k, index):
   
     # salvo i grafi su file
     networkit.graphio.writeGraph(random_weighted_bag, f"BarabasiAlbertGraphs/BAG_{index}.TabOne", networkit.Format.EdgeListTabOne)
-    print(f"BAG_{index}.TabOne saved in {time.time() - start}")
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"BAG_{index}.TabOne saved in {time.time() - start}")
 
     start_missing = time.time()
     saveSingleBAG_MissingEdges(index, random_weighted_bag)
-    print(f"missingEdge_ {index} saved in {time.time() - start_missing}")
+    
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"missingEdge_ {index} saved in {time.time() - start_missing}")
 
 def genDefaultERG():
     inputSet = utility.getInputSetByDoubling(N_GRAPH, MIN_NODES, MIN_K, doubleNodes=True, doubleEdges=False)

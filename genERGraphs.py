@@ -11,7 +11,11 @@
 # ErdosRenyiGraph File:                 ErdosRenyiGraphs/ERG_x.TabOne
 # ErdosRenyiGraph MissingEdge File:     ErdosRenyiGraphs/missingEdgeForERG_x.json
 import networkit, pandas, time
-import genBAGraph, utility
+import genBAGraph, utility, sys, logging
+
+logging.basicConfig(stream=sys.stderr)
+logger = logging.getLogger("genERGraph")
+logger.setLevel(logging.DEBUG)
 
 N_GRAPH = utility.N_GRAPH # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
 MIN_NODES = utility.MIN_NODES # minimum Number of nodes in the graph
@@ -30,7 +34,8 @@ def saveSingleERG_MissingEdges(counter, graph):
     edges = graph.numberOfEdges()
     max_edges =  (nodes * (nodes - 1) / 2) 
 
-    print(f"G=({nodes},{edges}), max_edges: {max_edges} edge_to_compute: {FIXED_EDGE_NUMBER}")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"G=({nodes},{edges}), max_edges: {max_edges} edge_to_compute: {FIXED_EDGE_NUMBER}")
     missingEdges = utility.getMissingEdgeRandomlyFromGraph(graph, FIXED_EDGE_NUMBER, MIN_EDGE_WEIGHT, MAX_EDGE_WEIGHT)
     
     assert edges + len(missingEdges) <= max_edges
@@ -54,11 +59,15 @@ def genAndStoreSingleErdosRenyiGraph(nMax, prob, index):
 
     # salvo i grafi su file
     networkit.graphio.writeGraph(random_weighted_erg, f"ErdosRenyiGraphs/ERG_{index}.TabOne", networkit.Format.EdgeListTabOne)
-    print(f"ERG_{index}.TabOne saved in {time.time() - start}")
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"ERG_{index}.TabOne saved in {time.time() - start}")
 
     start_missing = time.time()
     saveSingleERG_MissingEdges(index, random_weighted_erg)
-    print(f"missingEdge_{index} saved in {time.time() - start_missing}")
+    
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"missingEdge_{index} saved in {time.time() - start_missing}")
 
 def genDefaultBAG():
     inputSet = utility.getInputSetByDoubling(N_GRAPH, MIN_NODES, MIN_PROB, doubleNodes=True, doubleEdges=False)
