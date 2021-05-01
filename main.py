@@ -17,7 +17,7 @@ COMPUTE_FIRST_ALGO_RUN = False
 COMPUTE_PROCESS_TIME = False
 GRAPH_TO_CHECK = 6
 # e'  il numero di eventi randomici che avvengono ad ogni esperimento di dijkstra (per ogni grafo)
-EVENT_NUMBER_IN_EXP = 1999
+EVENT_NUMBER_IN_EXP = 4000
 
 def getRandomGraphEdgeEvent():
     # All possible graph event for DynDijkstra
@@ -446,7 +446,7 @@ if __name__ == "__main__":
     # grafici con running time (ordinate) ascisse ( vertici,archi, densita)
 
     test_Dijkstra_on_BAGs()
-    # test_Dijkstra_on_ERGs()
+    test_Dijkstra_on_ERGs()
 
     # valutare la media dei rapporti (speedup x ogni esecuzione)
     # e stessa cosa per il cambio del nodo sorgente

@@ -5,10 +5,10 @@ MIN_NODES = 500 # minimum Number of nodes in the graph
 MIN_K = 4 # minimum Number of attachments per node
 MIN_PROB = 0.02# minimum Probability of existence for each edge
 
-FIXED_EDGE_NUMBER = 5000
+FIXED_EDGE_NUMBER = 6000
 
-MIN_EDGE_WEIGHT =  10
-MAX_EDGE_WEIGHT = 20
+MIN_EDGE_WEIGHT =  1
+MAX_EDGE_WEIGHT = 1000
 
 # dato un grafo, ritorna una lista di archi (tuple (u,v,w) = (nodo1, nodo2, peso)) di lunghezza edge_number
 # oppure tutti gli archi mancanti se edge_number > archi mancanti 
@@ -54,5 +54,5 @@ def getInputSetByDoubling(nGraph, minNodes, minK, doubleNodes=True, doubleEdges=
         kSize.append(minK)
 
     inputSet = [(n,k) for n in nodesSize for k in kSize]
-    assert len(inputSet) == len(nodesSize) * len(probSize)
+    assert len(inputSet) == len(nodesSize) * len(kSize)
     return inputSet
