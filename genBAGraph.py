@@ -2,26 +2,23 @@
 # script utilizzato per generare grafi pesati e non orientati attraverso generatori random
 # input BarabasiAlbertGenerator: nGraph, minNodes, minK
 # attraverso il doubling experiment, minNodes e minK vengono raddoppiati indipendentemente nGraph volte
-# esempio output con nGraph = 3 => 9 grafi Barabasi e 9 Erdos:
-# minK\minNodes    10   20    40
-#              1 1\10 1\20  1\40
-#              2 2\10 2\20  2\40
-#              4 4\10 4\20  4\40
+# esempio output con nGraph = 3 => 9 BarabasiAlbertGraph:
+# (minK\minNodes)     10     20     40
+#                 1 (1\10) (1\20) (1\40)
+#                 2 (2\10) (2\20) (2\40)
+#                 4 (4\10) (4\20) (4\40)
 # per Barabasi minK = numero di archi uscenti da un nodo
-# per Erdos minProb = probabilita' dell' esistenza di ogni arco
 # BarabasiAlbertGraph File:             BarabasiAlbertGraphs/BAG_x.TabOne
 # BarabasiAlbertGraph MissingEdge File: BarabasiAlbertGraphs/missingEdgeForBAG_x.json
-import random, networkit, pandas, time
+import networkit, pandas, time
 import utility
 
-N_GRAPH = 6 # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
-MIN_NODES = 500 # minimum Number of nodes in the graph
-MIN_K = 4 # minimum Number of attachments per node
-
-FIXED_EDGE_NUMBER = 5000
-
-MIN_EDGE_WEIGHT =  10
-MAX_EDGE_WEIGHT = 20
+N_GRAPH = utility.N_GRAPH # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
+MIN_NODES = utility.MIN_NODES # minimum Number of nodes in the graph
+MIN_K = utility.MIN_K # minimum Number of attachments per node
+FIXED_EDGE_NUMBER = utility.FIXED_EDGE_NUMBER
+MIN_EDGE_WEIGHT =  utility.MIN_EDGE_WEIGHT
+MAX_EDGE_WEIGHT = utility.MAX_EDGE_WEIGHT
 
 # BAG: BarabasiAlbertGraph
 def saveSingleBAG_MissingEdges(counter, graph):
@@ -39,8 +36,7 @@ def saveSingleBAG_MissingEdges(counter, graph):
     assert edges + len(missingEdges) <= max_edges
     df = pandas.DataFrame(missingEdges, columns =['from_node', 'to_node', 'weight'])
     pandas.DataFrame.to_json(df, f"BarabasiAlbertGraphs/missingEdgeForBAG_{counter}.json", indent=4)
-
-
+    
 # genero grafo, salvo grafo, calcolo missingEdge e salvo missingEdge
 def genAndStoreSingleBAG(nMax, k, index):
     # BarabasiAlbertGenerator(count k, count nMax, count n0 = 0, bool batagelj = true)
@@ -66,9 +62,12 @@ def genAndStoreSingleBAG(nMax, k, index):
     saveSingleBAG_MissingEdges(index, random_weighted_bag)
     print(f"missingEdge_ {index} saved in {time.time() - start_missing}")
 
-
-if __name__ == "__main__":
+def genDefaultERG():
     inputSet = utility.getInputSetByDoubling(N_GRAPH, MIN_NODES, MIN_K, doubleNodes=True, doubleEdges=False)
     for input in inputSet:
         nMax, k = input
         genAndStoreSingleBAG(nMax, k, inputSet.index(input)+1)
+
+
+if __name__ == "__main__":
+    genDefaultERG()

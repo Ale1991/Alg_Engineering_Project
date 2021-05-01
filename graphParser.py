@@ -125,7 +125,7 @@ if __name__ == "__main__":
     # print(parser.ERGs_file_path)
     # print(parser.ERGs_missing_edges_file_path)
     # test_getNextBAG()
-    test_getNextERG()
+    # test_getNextERG()
     pass
 
 
