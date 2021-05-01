@@ -464,6 +464,7 @@ def plotAllSpeedUp(speedUp_list):
     # SUBPLOT 1
     ax.set_xlabel('event', fontsize=10)
     ax.set_ylabel('speedup', fontsize=10)
+
     x = [x for x in range(len(speedUp_list))]
     plt.scatter(x, speedUp_list)
     model = numpy.polyfit(x, speedUp_list, 10)
@@ -477,6 +478,29 @@ def plotAllSpeedUp(speedUp_list):
     # ax.plot(x, speedUp_list, marker="o", label= "staticDijkstraRT/dynDijkstraRT")
     # ax.legend()
     plt.show()
+
+def plotAvgSpeedUp(speedUp_list):
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    fig.suptitle('graph vs speedup', fontsize=20)
+
+    # SUBPLOT 1
+    ax.set_xlabel('graph number', fontsize=10)
+    ax.set_ylabel('speedup', fontsize=10)
+
+    all_graph = []
+    for iter in range(1,GRAPH_TO_CHECK+1):
+        graph_speedup = [speedUp_list[x] for x in range(iter * EVENT_NUMBER_IN_EXP)]
+        avg = numpy.average(graph_speedup)
+        all_graph.append(avg)
+
+    x = [x for x in range(1,GRAPH_TO_CHECK+1)]
+    plt.plot(x, all_graph, marker="o", c = 'r')
+
+    # ax.plot(x, speedUp_list, marker="o", label= "staticDijkstraRT/dynDijkstraRT")
+    # ax.legend()
+    plt.show()
+
 # # # # # # # # #
 # PLOT FUNCTION #
 # # # # # # # # #
@@ -562,5 +586,6 @@ if __name__ == "__main__":
 
         
 
-    plotAllSpeedUp(avg_SpeedUp)
+    # plotAllSpeedUp(avg_SpeedUp)
+    plotAvgSpeedUp(avg_SpeedUp)
     print('finish')

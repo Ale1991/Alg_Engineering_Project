@@ -9,8 +9,6 @@
 #              4 4\10 4\20  4\40
 # per Barabasi minK = numero di archi uscenti da un nodo
 # per Erdos minProb = probabilita' dell' esistenza di ogni arco
-# BarabasiAlbertGraph File:             BarabasiAlbertGraphs/BAG_x.TabOne
-# BarabasiAlbertGraph MissingEdge File: BarabasiAlbertGraphs/missingEdgeForBAG_x.json
 # ErdosRenyiGraph File:                 ErdosRenyiGraphs/ERG_x.TabOne
 # ErdosRenyiGraph MissingEdge File:     ErdosRenyiGraphs/missingEdgeForERG_x.json
 import random, networkit, pandas, time
@@ -18,7 +16,7 @@ import genBAGraph
 
 N_GRAPH = genBAGraph.N_GRAPH # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
 MIN_NODES = genBAGraph.MIN_NODES # minimum Number of nodes in the graph
-MIN_PROB = 0.01# minimum Probability of existence for each edge
+MIN_PROB = 0.02# minimum Probability of existence for each edge
 
 PERCENTAGE_OF_MISSING_EDGE_TO_COMPUTE = genBAGraph.PERCENTAGE_OF_MISSING_EDGE_TO_COMPUTE
 
