@@ -446,7 +446,7 @@ if __name__ == "__main__":
     # grafici con running time (ordinate) ascisse ( vertici,archi, densita)
 
     test_Dijkstra_on_BAGs()
-    test_Dijkstra_on_ERGs()
+    # test_Dijkstra_on_ERGs()
 
     # valutare la media dei rapporti (speedup x ogni esecuzione)
     # e stessa cosa per il cambio del nodo sorgente
