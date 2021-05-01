@@ -1,4 +1,6 @@
 import pandas, numpy, os, sys, logging, utility
+
+from pandas.core.frame import DataFrame
 import matplotlib.pyplot as plt
 import matplotlib.collections as mcol
 from matplotlib.legend_handler import HandlerLineCollection, HandlerTuple
@@ -9,76 +11,19 @@ logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("plotResult")
 logger.setLevel(logging.DEBUG)
 
-from enum import Enum
-# BarabasiAlbertGraph, ErdosRenyiGraph
-class GraphTypes(Enum):
-    BAG = 1
-    ERG = 2
-
-    def Name(self):
-        return self.name
-
-class DijkstraAlgoTypes(Enum):
-    STATIC = 1
-    DYNAMIC = 2
-    
-    def Name(self):
-        return self.name
-
-STATIC_RESULT_FOLDER = "Result/Static"
-DYNAMIC_RESULT_FOLDER = "Result/Dynamic"
-FILE_TYPE = ".json"
-
-GRAPH_TO_CHECK = 6
-
-# e'  il numero di eventi randomici che avvengono ad ogni esperimento di dijkstra (per ogni grafo)
-EVENT_NUMBER_IN_EXP = 1999
-
-def saveStaticResult(map):
-    # tipo del grafo, es: generati da BarabasiAlbert -> BAG, generati da ErdosRenyi -> ERG
-    graph_type = map['graph_type']
-    # numero del grafo, riferito ai grafi letti da file
-    graph_number = map['graph_number']
-    # numero di nodi del grafo
-    nodes = map['nodes']
-    # numero di archi del grafo
-    edges = map['edges']
-    # (event, running time)
-    result_list = map['result_list']
-
-    # columns=['graph_type', 'graph_number', 'nodes', 'edges', 'result_list']
-    df = pandas.DataFrame([map])
-    pandas.DataFrame.to_json(df, f"Result/Static/{graph_type}_{graph_number}.json", indent=4, orient='records')
-
-def saveDynamicResult(map):
-    # tipo del grafo, es: generati da BarabasiAlbert -> BAG, generati da ErdosRenyi -> ERG
-    graph_type = map['graph_type']
-    # numero del grafo, riferito ai grafi letti da file
-    graph_number = map['graph_number']
-    # numero di nodi del grafo
-    nodes = map['nodes']
-    # numero di archi del grafo
-    edges = map['edges']
-    # (event, running time)
-    result_list = map['result_list']
-
-    # columns=['graph_type', 'graph_number', 'nodes', 'edges', 'result_list']
-    df = pandas.DataFrame([map])
-    pandas.DataFrame.to_json(df, f"Result/Dynamic/{graph_type}_{graph_number}.json", indent=4, orient='records')
-
 # algo_type = static/dynamic
 # type = GraphTypes
 # index = graph number
 def readResultFromFile(algo_type, graph_type, index):
     folder = ""
-    if(algo_type == DijkstraAlgoTypes.STATIC):
-        folder = STATIC_RESULT_FOLDER
-    elif(algo_type == DijkstraAlgoTypes.DYNAMIC):
-        folder = DYNAMIC_RESULT_FOLDER
+    if(algo_type == utility.DijkstraAlgoTypes.STATIC):
+        folder = utility.STATIC_RESULT_FOLDER
+    elif(algo_type == utility.DijkstraAlgoTypes.DYNAMIC):
+        folder = utility.DYNAMIC_RESULT_FOLDER
     else:
         pass # error
 
-    searchingFile = (graph_type.Name() + "_" + index.__str__() + FILE_TYPE)
+    searchingFile = (graph_type.Name() + "_" + index.__str__() + utility.FILE_TYPE)
 
     for root, dirs, files in os.walk(folder):
         for file in files:
@@ -487,12 +432,12 @@ def plotAvgSpeedUp(speedUp_list):
     ax.set_ylabel('speedup', fontsize=10)
 
     all_graph = []
-    for iter in range(1,GRAPH_TO_CHECK+1):
-        graph_speedup = [speedUp_list[x] for x in range(iter * EVENT_NUMBER_IN_EXP)]
+    for iter in range(1,utility.GRAPH_TO_CHECK+1):
+        graph_speedup = [speedUp_list[x] for x in range(iter * utility.EVENT_NUMBER_IN_EXP)]
         avg = numpy.average(graph_speedup)
         all_graph.append(avg)
 
-    x = [x for x in range(1,GRAPH_TO_CHECK+1)]
+    x = [x for x in range(1,utility.GRAPH_TO_CHECK+1)]
     plt.plot(x, all_graph, marker="o", c = 'r')
 
     # ax.plot(x, speedUp_list, marker="o", label= "staticDijkstraRT/dynDijkstraRT")
@@ -521,13 +466,10 @@ def plotAll(map_result_by_node, dyn_map_result_by_node, map_result_by_edge,dyn_m
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug("Test end")
 
-if __name__ == "__main__":
-    # PROJECT GOAL
-    # cambio radice sssp per ammortizzare il bias (10 di cambi)
-    # 4 exp per cambio taglia nodi, 4 per archi 
-    # 4 cambi di tipologia di grafi (barabasi, erdos, qualche grafo reale)
-    # grafici con running time (ordinate) ascisse ( vertici,archi, densita)
-    # plotAll()
+def plotGraphByType(graphType):
+    if(isinstance(graphType, utility.GraphTypes) == False):
+        return
+
     map_result_by_node = {}
     map_result_by_edge = {}
 
@@ -536,59 +478,74 @@ if __name__ == "__main__":
 
     avg_SpeedUp = []
     len_counter = 0
-    for index in range(GRAPH_TO_CHECK):
+    for index in range(utility.GRAPH_TO_CHECK):
 
         # da qui ciclo per tutti i file per ricostruire le dyn_map_result_by_nodes da dare in pasto alle plot func
-        result_map = readResultFromFile(DijkstraAlgoTypes.STATIC, GraphTypes.ERG, index)
-        graph_type = result_map['graph_type'].item()
-        graph_number = result_map['graph_number'].item()
-        nodes = result_map['nodes'].item()
-        edges = result_map['edges'].item()
-        total_weight = result_map['total_weight'].item()
-        static_result_list = result_map['result_list'].item()
+        result_map = readResultFromFile(utility.DijkstraAlgoTypes.STATIC, graphType, index)
+        if(isinstance(result_map, DataFrame) == False):
+            logger.debug(f"File {graphType}_{index} for {utility.DijkstraAlgoTypes.STATIC} not found")
+        else:     
+            graph_type = result_map['graph_type'].item()
+            graph_number = result_map['graph_number'].item()
+            nodes = result_map['nodes'].item()
+            edges = result_map['edges'].item()
+            total_weight = result_map['total_weight'].item()
+            static_result_list = result_map['result_list'].item()
 
-        cmp_array = [x[1] for x in static_result_list]
-        np_avg = numpy.average(cmp_array)
-        np_var = numpy.var(cmp_array, dtype=numpy.float64)
+            cmp_array = [x[1] for x in static_result_list]
+            np_avg = numpy.average(cmp_array)
+            np_var = numpy.var(cmp_array, dtype=numpy.float64)
 
-        # valutare la media dei rapporti (speedup x ogni esecuzione)
-        # e stessa cosa per il cambio del nodo sorgente
+            # valutare la media dei rapporti (speedup x ogni esecuzione)
+            # e stessa cosa per il cambio del nodo sorgente
 
-        map_result_by_node[(nodes, edges, total_weight)] = (np_avg, np_var)
-        map_result_by_edge[(edges, nodes, total_weight)] = (np_avg, np_var)
+            map_result_by_node[(nodes, edges, total_weight)] = (np_avg, np_var)
+            map_result_by_edge[(edges, nodes, total_weight)] = (np_avg, np_var)
 
 
-        dyn_result_map = readResultFromFile(DijkstraAlgoTypes.DYNAMIC, GraphTypes.ERG, index)
-        graph_type = dyn_result_map['graph_type'].item()
-        graph_number = dyn_result_map['graph_number'].item()
-        nodes = dyn_result_map['nodes'].item()
-        edges = dyn_result_map['edges'].item()
-        total_weight = dyn_result_map['total_weight'].item()
-        dynamic_result_list = dyn_result_map['result_list'].item()
+            dyn_result_map = readResultFromFile(utility.DijkstraAlgoTypes.DYNAMIC, graphType, index)
+            graph_type = dyn_result_map['graph_type'].item()
+            graph_number = dyn_result_map['graph_number'].item()
+            nodes = dyn_result_map['nodes'].item()
+            edges = dyn_result_map['edges'].item()
+            total_weight = dyn_result_map['total_weight'].item()
+            dynamic_result_list = dyn_result_map['result_list'].item()
 
-        cmp_dyn_array = [x[1] for x in dynamic_result_list]
-        np_dyn_avg = numpy.average(cmp_dyn_array)
-        np_dyn_var = numpy.var(cmp_dyn_array, dtype=numpy.float64)
+            cmp_dyn_array = [x[1] for x in dynamic_result_list]
+            np_dyn_avg = numpy.average(cmp_dyn_array)
+            np_dyn_var = numpy.var(cmp_dyn_array, dtype=numpy.float64)
 
-        dyn_map_result_by_node[(nodes, edges, total_weight)] = (np_dyn_avg, np_dyn_var)
-        dyn_map_result_by_edge[(edges, nodes, total_weight)] = (np_dyn_avg, np_dyn_var)
+            dyn_map_result_by_node[(nodes, edges, total_weight)] = (np_dyn_avg, np_dyn_var)
+            dyn_map_result_by_edge[(edges, nodes, total_weight)] = (np_dyn_avg, np_dyn_var)
 
-        for i in range(len(dynamic_result_list)):
-            if(dynamic_result_list[i][0] == static_result_list[i][0]):
-                speedup = static_result_list[i][1]/dynamic_result_list[i][1]
-                avg_SpeedUp.append(speedup)
+            for i in range(len(dynamic_result_list)):
+                if(dynamic_result_list[i][0] == static_result_list[i][0]):
+                    speedup = static_result_list[i][1]/dynamic_result_list[i][1]
+                    avg_SpeedUp.append(speedup)
 
-        len_counter += len(dynamic_result_list)
-        if(len(avg_SpeedUp) == len_counter):
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"ok for G{index}")
-        else:
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"something went wrong for G{index}")
+            len_counter += len(dynamic_result_list)
+            if(len(avg_SpeedUp) == len_counter):
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f"ok for G{index}")
+            else:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f"something went wrong for G{index}")
 
         
 
     # plotAllSpeedUp(avg_SpeedUp)
-    plotAvgSpeedUp(avg_SpeedUp)
+    if(len(avg_SpeedUp) > 0):
+        plotAvgSpeedUp(avg_SpeedUp)
+
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug('finish')
+
+
+if __name__ == "__main__":
+    # PROJECT GOAL
+    # cambio radice sssp per ammortizzare il bias (10 di cambi)
+    # 4 exp per cambio taglia nodi, 4 per archi 
+    # 4 cambi di tipologia di grafi (barabasi, erdos, qualche grafo reale)
+    # grafici con running time (ordinate) ascisse ( vertici,archi, densita)
+    # plotAll()
+    plotGraphByType(utility.GraphTypes.BAG)

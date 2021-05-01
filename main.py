@@ -1,20 +1,11 @@
-from pickle import TRUE
-from networkit import dynamic
-from pandas.core.indexes.base import Index
-from genBAGraph import MAX_EDGE_WEIGHT, MIN_EDGE_WEIGHT
-import logging, time, numpy, math, random, networkit, graphParser, copy, sys
-import timeit
-import genBAGraph
+from utility import GraphTypes, MAX_EDGE_WEIGHT, MIN_EDGE_WEIGHT
+import logging, time, numpy, random, networkit, graphParser, copy, sys, timeit, pandas, utility
 
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("main")
 logger.setLevel(logging.DEBUG)
 
-COMPUTE_FIRST_ALGO_RUN = False
-COMPUTE_PROCESS_TIME = False
-GRAPH_TO_CHECK = 6
-# e'  il numero di eventi randomici che avvengono ad ogni esperimento di dijkstra (per ogni grafo)
-EVENT_NUMBER_IN_EXP = 4000
+
 
 def getRandomGraphEdgeEvent():
     # All possible graph event for DynDijkstra
@@ -31,11 +22,11 @@ def getRandomGraphEdgeEvent():
 
 # return CPU/Process time
 def computeDijkstra(sssp):
-    if(COMPUTE_PROCESS_TIME == True):
+    if(utility.COMPUTE_PROCESS_TIME == True):
         start_time = timeit.default_timer()# Process time
         sssp.run()
         return (timeit.default_timer() - start_time)
-    elif(COMPUTE_PROCESS_TIME == False):
+    elif(utility.COMPUTE_PROCESS_TIME == False):
         start_time = time.process_time()# CPU time
         sssp.run()
         return (time.process_time() - start_time)
@@ -45,7 +36,7 @@ def computeDijkstra(sssp):
 
 # return CPU/Process time
 def computeDynDijkstra(dynDijkstra, event):
-    if(COMPUTE_PROCESS_TIME == True):
+    if(utility.COMPUTE_PROCESS_TIME == True):
         if(type(event) is networkit.dynamic.GraphEvent):
             start_time = timeit.default_timer()# Process time
             dynDijkstra.update(event)
@@ -54,7 +45,7 @@ def computeDynDijkstra(dynDijkstra, event):
             start_time = timeit.default_timer()# Process time
             dynDijkstra.run()
             return (timeit.default_timer() - start_time)
-    elif(COMPUTE_PROCESS_TIME == False):  
+    elif(utility.COMPUTE_PROCESS_TIME == False):  
         if(type(event) is networkit.dynamic.GraphEvent):
             start_time = time.process_time() # CPU time
             dynDijkstra.update(event)
@@ -85,7 +76,7 @@ def DijkstraWithRandomEventTest(graph, event_number, missing_edge_to_add):
     dynSssp = networkit.distance.DynDijkstra(dyn_localGraph, 0)
 
     # tupla con (evento, #nodi, #archi, tempo)
-    if(COMPUTE_FIRST_ALGO_RUN):
+    if(utility.COMPUTE_FIRST_ALGO_RUN):
         static_computing_time_list.append(("FIRST_RUN", computeDijkstra(sssp)))
         dynamic_computing_time_list.append(("FIRST_RUN", computeDynDijkstra(dynSssp, "FIRST_RUN")))
     else:
@@ -175,7 +166,7 @@ def handleEdgeRemovalEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, sta
     # randomEdge(G, uniformDistribution=False) returns a random edge of graph G. 
     # If uniformDistribution is set to True, the edge is selected uniformly at random.
     from_node, to_node = networkit.graphtools.randomEdge(localGraph, True)
-    new_weight = genBAGraph.MAX_EDGE_WEIGHT
+    new_weight = MAX_EDGE_WEIGHT
     assert localGraph.hasEdge(from_node, to_node) == True
     assert dyn_localGraph.hasEdge(from_node, to_node) == True
     localGraph.setWeight(from_node, to_node, new_weight)
@@ -283,14 +274,14 @@ def test_Dijkstra_on_BAGs():
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f"break: {response}")
             break
-        elif(isinstance(response[0], int) and response[0] <= GRAPH_TO_CHECK - 1):
+        elif(isinstance(response[0], int) and response[0] <= utility.GRAPH_TO_CHECK - 1):
             index, graph, randomMissingEdgeList = response
             # Static Dijkstra test - worst-case time O(m+n logn) con Fib. Heap
             g0_nodes = graph.numberOfNodes()
             g0_edges = graph.numberOfEdges()
             g0_totalEdgeWeight = graph.totalEdgeWeight()
 
-            static_result_list, dynamic_result_list = DijkstraWithRandomEventTest(graph, EVENT_NUMBER_IN_EXP, randomMissingEdgeList)
+            static_result_list, dynamic_result_list = DijkstraWithRandomEventTest(graph, utility.EVENT_NUMBER_IN_EXP, randomMissingEdgeList)
 
             cmp_array = [x[1] for x in static_result_list]
 
@@ -310,22 +301,22 @@ def test_Dijkstra_on_BAGs():
             dyn_map_result_by_node[(g0_nodes, g0_edges, g0_totalEdgeWeight)] = (np_dyn_avg, np_dyn_var)
             dyn_map_result_by_edge[(g0_edges, g0_nodes, g0_totalEdgeWeight)] = (np_dyn_avg, np_dyn_var)
 
-            avg_map = {"graph_type" : "BAG",
+            avg_map = {"graph_type" : utility.GraphTypes.BAG.Name(),
                         "graph_number" : index,
                         "nodes" : g0_nodes,
                         "edges" : g0_edges,
                         "total_weight" : graph.totalEdgeWeight(),
                         "result_list" : static_result_list}
 
-            dyn_avg_map = {"graph_type" : "BAG",
+            dyn_avg_map = {"graph_type" : utility.GraphTypes.BAG.Name(),
                         "graph_number" : index,
                         "nodes" : g0_nodes,
                         "edges" : g0_edges,
                         "total_weight" : graph.totalEdgeWeight(),
                         "result_list" : dynamic_result_list}
             
-            saveStaticResult(avg_map)
-            saveDynamicResult(dyn_avg_map)
+            saveResult(avg_map, utility.ResultType.Static)
+            saveResult(dyn_avg_map, utility.ResultType.Dynamic)
         else:
             break
 
@@ -350,14 +341,14 @@ def test_Dijkstra_on_ERGs():
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f"break: {response}")
             break
-        elif(isinstance(response[0], int) and response[0] <= GRAPH_TO_CHECK - 1):
+        elif(isinstance(response[0], int) and response[0] <= utility.GRAPH_TO_CHECK - 1):
             index, graph, randomMissingEdgeList = response
             # Static Dijkstra test - worst-case time O(m+n logn) con Fib. Heap
             g0_nodes = graph.numberOfNodes()
             g0_edges = graph.numberOfEdges()
             g0_totalEdgeWeight = graph.totalEdgeWeight()
 
-            static_result_list, dynamic_result_list = DijkstraWithRandomEventTest(graph, EVENT_NUMBER_IN_EXP, randomMissingEdgeList)
+            static_result_list, dynamic_result_list = DijkstraWithRandomEventTest(graph, utility.EVENT_NUMBER_IN_EXP, randomMissingEdgeList)
 
             cmp_array = [x[1] for x in static_result_list]
 
@@ -376,35 +367,101 @@ def test_Dijkstra_on_ERGs():
             dyn_map_result_by_node[(g0_nodes, g0_edges, g0_totalEdgeWeight, "graph_number")] = (np_dyn_avg, np_dyn_var, index)
             dyn_map_result_by_edge[(g0_edges, g0_nodes, g0_totalEdgeWeight, "graph_number")] = (np_dyn_avg, np_dyn_var, index)
 
-            # avg_map["graph_type", "graph_number", "nodes", "edges", "result_list"] = ["ERG", index, g0_nodes, g0_edges, static_result_list]
-            # dyn_avg_map["graph_type", "graph_number", "nodes", "edges", "result_list"] = ["ERG", index, g0_nodes, g0_edges, dynamic_result_list] 
-
-            avg_map = {"graph_type" : "ERG",
+            avg_map = {"graph_type" : utility.GraphTypes.ERG.Name(),
                         "graph_number" : index,
                         "nodes" : g0_nodes,
                         "edges" : g0_edges,
                         "total_weight" : graph.totalEdgeWeight(),
                         "result_list" : static_result_list}
 
-            dyn_avg_map = {"graph_type" : "ERG",
+            dyn_avg_map = {"graph_type" : utility.GraphTypes.ERG.Name(),
                         "graph_number" : index,
                         "nodes" : g0_nodes,
                         "edges" : g0_edges,
                         "total_weight" : graph.totalEdgeWeight(),
                         "result_list" : dynamic_result_list}
             
-            saveStaticResult(avg_map)
-            saveDynamicResult(dyn_avg_map)
-            # plotResultList(index, "ERG",static_result_list, dynamic_result_list)  
+            saveResult(avg_map, utility.ResultType.Static)
+            saveResult(dyn_avg_map, utility.ResultType.Dynamic)  
         else:
             break
 
 
     # plotAll(map_result_by_node, dyn_map_result_by_node, map_result_by_edge,dyn_map_result_by_edge, weighted=True)
 
-def saveStaticResult(map):
-    import pandas
 
+def test_DijkstraOnGraphType(graphType):
+    if(isinstance(graphType, GraphTypes) == False):
+        return
+
+    parser = graphParser.file_Parser()
+
+    map_result_by_node = {}
+    map_result_by_edge = {}
+
+    dyn_map_result_by_node = {}
+    dyn_map_result_by_edge = {}
+
+    while(True):
+        if(graphType == GraphTypes.BAG):
+            response = parser.getNextBAG()
+        elif(graphType == GraphTypes.ERG):
+            response = parser.getNextERG()
+
+        if(response[0] == "no_more_graphs" or response == "not_exist"):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"break: {response}")
+            break
+        elif(isinstance(response[0], int) and response[0] <= utility.GRAPH_TO_CHECK - 1):
+            index, graph, randomMissingEdgeList = response
+            # Static Dijkstra test - worst-case time O(m+n logn) con Fib. Heap
+            g0_nodes = graph.numberOfNodes()
+            g0_edges = graph.numberOfEdges()
+            g0_totalEdgeWeight = graph.totalEdgeWeight()
+
+            static_result_list, dynamic_result_list = DijkstraWithRandomEventTest(graph, utility.EVENT_NUMBER_IN_EXP, randomMissingEdgeList)
+
+            cmp_array = [x[1] for x in static_result_list]
+
+            np_avg = numpy.average(cmp_array)
+            np_var = numpy.var(cmp_array, dtype=numpy.float64)
+            # valutare la media dei rapporti (speedup x ogni esecuzione)
+            # e stessa cosa per il cambio del nodo sorgente
+            map_result_by_node[(g0_nodes, g0_edges, g0_totalEdgeWeight)] = (np_avg, np_var)
+            map_result_by_edge[(g0_edges, g0_nodes, g0_totalEdgeWeight)] = (np_avg, np_var)
+
+
+            cmp_dyn_array = [x[1] for x in dynamic_result_list]
+
+            np_dyn_avg = numpy.average(cmp_dyn_array)
+            np_dyn_var = numpy.var(cmp_dyn_array, dtype=numpy.float64)
+            
+            dyn_map_result_by_node[(g0_nodes, g0_edges, g0_totalEdgeWeight)] = (np_dyn_avg, np_dyn_var)
+            dyn_map_result_by_edge[(g0_edges, g0_nodes, g0_totalEdgeWeight)] = (np_dyn_avg, np_dyn_var)
+
+            avg_map = {"graph_type" : graphType.Name(),
+                        "graph_number" : index,
+                        "nodes" : g0_nodes,
+                        "edges" : g0_edges,
+                        "total_weight" : graph.totalEdgeWeight(),
+                        "result_list" : static_result_list}
+
+            dyn_avg_map = {"graph_type" : graphType.Name(),
+                        "graph_number" : index,
+                        "nodes" : g0_nodes,
+                        "edges" : g0_edges,
+                        "total_weight" : graph.totalEdgeWeight(),
+                        "result_list" : dynamic_result_list}
+            
+            saveResult(avg_map, utility.ResultType.Static)
+            saveResult(dyn_avg_map, utility.ResultType.Dynamic)
+        else:
+            break
+
+    # plotAll(map_result_by_node, dyn_map_result_by_node, map_result_by_edge,dyn_map_result_by_edge, weighted=True)
+
+
+def saveResult(map, resultType):
     # tipo del grafo, es: generati da BarabasiAlbert -> BAG, generati da ErdosRenyi -> ERG
     graph_type = map['graph_type']
     # numero del grafo, riferito ai grafi letti da file
@@ -418,25 +475,11 @@ def saveStaticResult(map):
 
     # columns=['graph_type', 'graph_number', 'nodes', 'edges', 'result_list']
     df = pandas.DataFrame([map])
-    pandas.DataFrame.to_json(df, f"Result/Static/{graph_type}_{graph_number}.json", indent=4, orient='records')
 
-def saveDynamicResult(map):
-    import pandas
-
-    # tipo del grafo, es: generati da BarabasiAlbert -> BAG, generati da ErdosRenyi -> ERG
-    graph_type = map['graph_type']
-    # numero del grafo, riferito ai grafi letti da file
-    graph_number = map['graph_number']
-    # numero di nodi del grafo
-    nodes = map['nodes']
-    # numero di archi del grafo
-    edges = map['edges']
-    # (event, running time)
-    result_list = map['result_list']
-
-    # columns=['graph_type', 'graph_number', 'nodes', 'edges', 'result_list']
-    df = pandas.DataFrame([map])
-    pandas.DataFrame.to_json(df, f"Result/Dynamic/{graph_type}_{graph_number}.json", indent=4, orient='records')
+    if(resultType == utility.ResultType.Static):
+        pandas.DataFrame.to_json(df, f"{utility.STATIC_RESULT_FOLDER}/{graph_type}_{graph_number}.json", indent=4, orient='records')
+    elif(resultType == utility.ResultType.Dynamic):
+        pandas.DataFrame.to_json(df, f"{utility.DYNAMIC_RESULT_FOLDER}/{graph_type}_{graph_number}.json", indent=4, orient='records')
 
 
 if __name__ == "__main__":
@@ -446,8 +489,9 @@ if __name__ == "__main__":
     # 4 cambi di tipologia di grafi (barabasi, erdos, qualche grafo reale)
     # grafici con running time (ordinate) ascisse ( vertici,archi, densita)
 
-    test_Dijkstra_on_BAGs()
-    test_Dijkstra_on_ERGs()
+    # test_Dijkstra_on_BAGs()
+    # test_Dijkstra_on_ERGs()
+    test_DijkstraOnGraphType(GraphTypes.BAG)
 
     # valutare la media dei rapporti (speedup x ogni esecuzione)
     # e stessa cosa per il cambio del nodo sorgente

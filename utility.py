@@ -10,6 +10,41 @@ FIXED_EDGE_NUMBER = 6000
 MIN_EDGE_WEIGHT =  1
 MAX_EDGE_WEIGHT = 1000
 
+from enum import Enum
+# BarabasiAlbertGraph, ErdosRenyiGraph
+class GraphTypes(Enum):
+    BAG = 1
+    ERG = 2
+
+    def Name(self):
+        return self.name
+
+class DijkstraAlgoTypes(Enum):
+    STATIC = 1
+    DYNAMIC = 2
+    
+    def Name(self):
+        return self.name
+
+STATIC_RESULT_FOLDER = "Result/Static"
+DYNAMIC_RESULT_FOLDER = "Result/Dynamic"
+FILE_TYPE = ".json"
+
+# MAIN.PY SETTING
+COMPUTE_FIRST_ALGO_RUN = False
+COMPUTE_PROCESS_TIME = False
+GRAPH_TO_CHECK = 6
+# e'  il numero di eventi randomici che avvengono ad ogni esperimento di dijkstra (per ogni grafo)
+EVENT_NUMBER_IN_EXP = 4000
+
+
+class ResultType(Enum):
+    Static = 1
+    Dynamic = 2
+
+    def Name(self):
+        return self.name
+
 # dato un grafo, ritorna una lista di archi (tuple (u,v,w) = (nodo1, nodo2, peso)) di lunghezza edge_number
 # oppure tutti gli archi mancanti se edge_number > archi mancanti 
 def getMissingEdgeRandomlyFromGraph(graph, edge_number, min_weight, max_weight):
