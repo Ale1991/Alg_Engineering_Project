@@ -12,47 +12,16 @@
 # BarabasiAlbertGraph File:             BarabasiAlbertGraphs/BAG_x.TabOne
 # BarabasiAlbertGraph MissingEdge File: BarabasiAlbertGraphs/missingEdgeForBAG_x.json
 import random, networkit, pandas, time
+import utility
 
 N_GRAPH = 6 # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
 MIN_NODES = 500 # minimum Number of nodes in the graph
 MIN_K = 4 # minimum Number of attachments per node
 
-PERCENTAGE_OF_MISSING_EDGE_TO_COMPUTE = 0.00001
-
 FIXED_EDGE_NUMBER = 5000
-FIXED_EDGE = True
 
 MIN_EDGE_WEIGHT =  10
 MAX_EDGE_WEIGHT = 20
-
-GEN_NEW_BAG = True
-
-# dato un grafo, ritorna una lista di archi (tuple (u,v,w) = (nodo1, nodo2, peso)) di lunghezza edge_number
-# oppure tutti gli archi mancanti se edge_number > archi mancanti 
-def getMissingEdgeRandomlyFromGraph(graph, edge_number):
-    missingEdges = []
-    nodes = graph.numberOfNodes()
-    edges = graph.numberOfEdges()
-    
-    max_missing_edges = (nodes * (nodes - 1) / 2) - edges
-    nodeList = [node for node in range(nodes)]
-
-    # finche' non ho costruito una lista con edge_number archi mancanti
-    while (len(missingEdges) < edge_number and len(missingEdges) < max_missing_edges):
-        # prendo due nodi random dall'insieme dei nodi
-        edge = (random.sample(nodeList, 2))
-        edge.append(random.randint(MIN_EDGE_WEIGHT, MAX_EDGE_WEIGHT))
-        # se il grafo non contiene quell'arco E non e' gia' stato aggiunto alla lista degli archi mancanti, lo aggiungo
-        if ((graph.hasEdge(edge[0], edge[1]) == False) and missingEdges.__contains__(edge) == False):
-            missingEdges.append(edge)
-
-    return missingEdges
-
-def getRandomWeightedGraph(graph):
-    for edge in graph.iterEdges():
-        graph.setWeight(edge[0],edge[1],random.randint(MIN_EDGE_WEIGHT, MAX_EDGE_WEIGHT))
-
-    return graph
 
 # BAG: BarabasiAlbertGraph
 def saveSingleBAG_MissingEdges(counter, graph):
@@ -64,33 +33,13 @@ def saveSingleBAG_MissingEdges(counter, graph):
     edges = graph.numberOfEdges()
     max_edges =  (nodes * (nodes - 1) / 2) 
 
-    if(FIXED_EDGE):
-        edge_to_compute = FIXED_EDGE_NUMBER
-    else:
-        edge_to_compute = int(max_edges * PERCENTAGE_OF_MISSING_EDGE_TO_COMPUTE)
-
-    print(f"G=({nodes},{edges}), max_edges: {max_edges} edge_to_compute: {edge_to_compute}")
-    missingEdges = getMissingEdgeRandomlyFromGraph(graph, edge_to_compute)
+    print(f"G=({nodes},{edges}), max_edges: {max_edges} edge_to_compute: {FIXED_EDGE_NUMBER}")
+    missingEdges = utility.getMissingEdgeRandomlyFromGraph(graph, FIXED_EDGE_NUMBER, MIN_EDGE_WEIGHT, MAX_EDGE_WEIGHT)
     
     assert edges + len(missingEdges) <= max_edges
     df = pandas.DataFrame(missingEdges, columns =['from_node', 'to_node', 'weight'])
     pandas.DataFrame.to_json(df, f"BarabasiAlbertGraphs/missingEdgeForBAG_{counter}.json", indent=4)
 
-def getInputSetByDoubling(nGraph, minNodes, minK, doubleNodes=True, doubleEdges=False):
-    nodesSize = [minNodes]
-    kSize = [minK]
-
-    # Doubling
-    for x in range(nGraph -1):
-        nodesSize.append(nodesSize[-1] * 2)
-        kSize.append(kSize[-1] * 2)
-
-    if(doubleEdges==False):
-        kSize.clear()
-        kSize.append(minK)
-
-    inputSet = [(n,k) for n in nodesSize for k in kSize]
-    return inputSet
 
 # genero grafo, salvo grafo, calcolo missingEdge e salvo missingEdge
 def genAndStoreSingleBAG(nMax, k, index):
@@ -107,7 +56,7 @@ def genAndStoreSingleBAG(nMax, k, index):
     weighted_bag = networkit.graphtools.toWeighted(bag)
 
     # assegno agli archi di ciascun grafo pesi random compresi fra MIN_EDGE_WEIGHT e MAX_EDGE_WEIGHT
-    random_weighted_bag = getRandomWeightedGraph(weighted_bag)
+    random_weighted_bag = utility.getRandomWeightedGraph(weighted_bag, MIN_EDGE_WEIGHT, MAX_EDGE_WEIGHT)
   
     # salvo i grafi su file
     networkit.graphio.writeGraph(random_weighted_bag, f"BarabasiAlbertGraphs/BAG_{index}.TabOne", networkit.Format.EdgeListTabOne)
@@ -119,24 +68,10 @@ def genAndStoreSingleBAG(nMax, k, index):
 
 
 if __name__ == "__main__":
-    inputSet = getInputSetByDoubling(N_GRAPH, MIN_NODES, MIN_K, doubleNodes=True, doubleEdges=False)
-    counter = 1
+    inputSet = utility.getInputSetByDoubling(N_GRAPH, MIN_NODES, MIN_K, doubleNodes=True, doubleEdges=False)
+    # counter = 1
     for input in inputSet:
         nMax, k = input
-        genAndStoreSingleBAG(nMax, k, counter)
-        counter +=1
-
-    # -> PREPROCESSING: inutile ricalcolare i grafi ogni volta, vogliamo analizzare lo speedup dei due algo di dijkstra
-    # al variare delle caratteristiche dei grafi
-    # TODO generare un metodo random per gli eventi dinamici
-    # event = networkit.dynamic.GraphEvent(networkit.dynamic.GraphEvent.EDGE_ADDITION, missing_edge[0],missing_edge[1], 0)
-
-
-# cambio radice sssp per ammortizzare il bias (10 di cambi)
-# 4 exp per cambio taglia nodi, 4 per archi 
-# 4 cambi di tipologia di grafi (barabasi, erdos, qualche grafo reale)
-# grafici con running time (ordinate) ascisse ( vertici,archi, densita)
-
-
-
-
+        genAndStoreSingleBAG(nMax, k, input.index())
+        # genAndStoreSingleBAG(nMax, k, counter)
+        # counter +=1
