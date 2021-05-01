@@ -64,14 +64,11 @@ def genAndStoreSingleBAG(nMax, k, index):
 
     start_missing = time.time()
     saveSingleBAG_MissingEdges(index, random_weighted_bag)
-    print(f"missingEdge_{index} saved in {time.time() - start_missing}")
+    print(f"missingEdge_ {index} saved in {time.time() - start_missing}")
 
 
 if __name__ == "__main__":
     inputSet = utility.getInputSetByDoubling(N_GRAPH, MIN_NODES, MIN_K, doubleNodes=True, doubleEdges=False)
-    # counter = 1
     for input in inputSet:
         nMax, k = input
-        genAndStoreSingleBAG(nMax, k, input.index())
-        # genAndStoreSingleBAG(nMax, k, counter)
-        # counter +=1
+        genAndStoreSingleBAG(nMax, k, inputSet.index(input)+1)
