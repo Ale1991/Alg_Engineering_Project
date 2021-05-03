@@ -421,7 +421,7 @@ def test_Dijkstra_on_ERGs():
     # plotAll(map_result_by_node, dyn_map_result_by_node, map_result_by_edge,dyn_map_result_by_edge, weighted=True)
 
 
-def test_DijkstraOnGraphType(graphType):
+def test_DijkstraOnGraphByType(graphType):
     if(isinstance(graphType, GraphTypes) == False):
         return
 
@@ -433,8 +433,7 @@ def test_DijkstraOnGraphType(graphType):
     dyn_map_result_by_node = {}
     dyn_map_result_by_edge = {}
 
-    while(True):
-        
+    while(True):      
         response = parser.getNextByType(graphType)
 
         if(response[0] == "no_more_graphs" or response == "not_exist"):
@@ -446,27 +445,28 @@ def test_DijkstraOnGraphType(graphType):
             # Static Dijkstra test - worst-case time O(m+n logn) con Fib. Heap
             g0_nodes = graph.numberOfNodes()
             g0_edges = graph.numberOfEdges()
-            g0_totalEdgeWeight = graph.totalEdgeWeight()
 
             static_result_list, dynamic_result_list = DijkstraWithRandomEventTest(graph, utility.EVENT_NUMBER_IN_EXP, randomMissingEdgeList)
 
-            cmp_array = [x[1] for x in static_result_list]
+            # cmp_array = [x[1] for x in static_result_list]
 
-            np_avg = numpy.average(cmp_array)
-            np_var = numpy.var(cmp_array, dtype=numpy.float64)
+            # np_avg = numpy.average(cmp_array)
+            # np_var = numpy.var(cmp_array, dtype=numpy.float64)
+
             # valutare la media dei rapporti (speedup x ogni esecuzione)
             # e stessa cosa per il cambio del nodo sorgente
-            map_result_by_node[(g0_nodes, g0_edges, g0_totalEdgeWeight)] = (np_avg, np_var)
-            map_result_by_edge[(g0_edges, g0_nodes, g0_totalEdgeWeight)] = (np_avg, np_var)
+
+            # map_result_by_node[(g0_nodes, g0_edges, g0_totalEdgeWeight)] = (np_avg, np_var)
+            # map_result_by_edge[(g0_edges, g0_nodes, g0_totalEdgeWeight)] = (np_avg, np_var)
 
 
-            cmp_dyn_array = [x[1] for x in dynamic_result_list]
+            # cmp_dyn_array = [x[1] for x in dynamic_result_list]
 
-            np_dyn_avg = numpy.average(cmp_dyn_array)
-            np_dyn_var = numpy.var(cmp_dyn_array, dtype=numpy.float64)
+            # np_dyn_avg = numpy.average(cmp_dyn_array)
+            # np_dyn_var = numpy.var(cmp_dyn_array, dtype=numpy.float64)
             
-            dyn_map_result_by_node[(g0_nodes, g0_edges, g0_totalEdgeWeight)] = (np_dyn_avg, np_dyn_var)
-            dyn_map_result_by_edge[(g0_edges, g0_nodes, g0_totalEdgeWeight)] = (np_dyn_avg, np_dyn_var)
+            # dyn_map_result_by_node[(g0_nodes, g0_edges, g0_totalEdgeWeight)] = (np_dyn_avg, np_dyn_var)
+            # dyn_map_result_by_edge[(g0_edges, g0_nodes, g0_totalEdgeWeight)] = (np_dyn_avg, np_dyn_var)
 
             avg_map = {"graph_type" : graphType.Name(),
                         "graph_number" : index,
@@ -522,8 +522,8 @@ if __name__ == "__main__":
     # test_Dijkstra_on_ERGs()
 
     start = time.process_time()
-    # test_DijkstraOnGraphType(GraphTypes.BAG)
-    test_DijkstraOnGraphType(GraphTypes.BAG)
+    # test_DijkstraOnGraphByType(GraphTypes.BAG)
+    test_DijkstraOnGraphByType(GraphTypes.ERG)
     if logger.isEnabledFor(logging.INFO):
         logger.info(f"Experiments ended in {time.process_time() - start} seconds")
 

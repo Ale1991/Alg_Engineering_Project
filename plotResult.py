@@ -548,4 +548,4 @@ if __name__ == "__main__":
     # 4 cambi di tipologia di grafi (barabasi, erdos, qualche grafo reale)
     # grafici con running time (ordinate) ascisse ( vertici,archi, densita)
     # plotAll()
-    plotGraphByType(utility.GraphTypes.BAG)
+    plotGraphByType(utility.GraphTypes.ERG)
