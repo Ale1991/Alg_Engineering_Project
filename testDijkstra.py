@@ -2,11 +2,11 @@ from utility import GraphTypes, MAX_EDGE_WEIGHT, MIN_EDGE_WEIGHT
 import logging, time, numpy, random, networkit, graphParser, copy, sys, timeit, pandas, utility
 
 logging.basicConfig(stream=sys.stderr)
-logger = logging.getLogger("main")
-logger.setLevel(logging.DEBUG)
+logger = logging.getLogger("testDijkstra")
+logger.setLevel(logging.INFO)
 
 
-
+# return random(networkit.dynamic.GraphEvent.EDGE_ADDITION, networkit.dynamic.GraphEvent.EDGE_WEIGHT_UPDATE)
 def getRandomGraphEdgeEvent():
     # All possible graph event for DynDijkstra
     # graph_event_list = [networkit.dynamic.GraphEvent.EDGE_ADDITION,networkit.dynamic.GraphEvent.EDGE_REMOVAL,
@@ -83,7 +83,8 @@ def DijkstraWithRandomEventTest(graph, event_number, missing_edge_to_add):
         sssp.run()
         dynSssp.run()
 
-    assert dynSssp.getDistances() == sssp.getDistances()
+    if logger.isEnabledFor(logging.DEBUG):
+        assert dynSssp.getDistances() == sssp.getDistances()
 
     # parte da 1 perche missing_edge_to_add in posizione 0 contiene le stringhe header
     edge_addition_counter = 1
@@ -117,22 +118,27 @@ def DijkstraWithRandomEventTest(graph, event_number, missing_edge_to_add):
 # calcola ed inserisce il RunningTime impiegato da Dijkstra e DynDijkstra per calcolare SSSP a fronte di un
 # evento EDGE_REMOVAL
 def handleEdgeAdditionEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list, edge_addition_counter, missing_edge_to_add):
-    assert localGraph.numberOfNodes() == dyn_localGraph.numberOfNodes()
-    assert localGraph.numberOfEdges() == dyn_localGraph.numberOfEdges()
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.numberOfNodes() == dyn_localGraph.numberOfNodes()
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.numberOfEdges() == dyn_localGraph.numberOfEdges()
 
     # COMMENTED PER EVITARE DI PRENDERE ARCHI MANCANTI DAI FILE JSON PRECALCOLATI
     # SOSTITUITO CON GENERAZIONE RANDOM IN LOCO
     # controllo che gli archi aggiunti siano minori della taglia dei missingEdges calcolati e salvati nel json
-    assert edge_addition_counter < missing_edge_to_add.index.size
+    if logger.isEnabledFor(logging.DEBUG):
+        assert edge_addition_counter < missing_edge_to_add.index.size
 
     from_node = missing_edge_to_add['from_node'][edge_addition_counter]
     to_node = missing_edge_to_add['to_node'][edge_addition_counter]
     weight = missing_edge_to_add['weight'][edge_addition_counter]
 
     # controllo che i nodi dell'arco da aggiungere siano diversi
-    assert from_node != to_node
+    if logger.isEnabledFor(logging.DEBUG):
+        assert from_node != to_node
 
-    assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
             
     # EDGE ADDITION EVENT
     localGraph.addEdge(from_node, to_node, weight)
@@ -145,18 +151,23 @@ def handleEdgeAdditionEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, st
     dynamic_computing_time_list.append(("EDGE_ADDITION", computeDynDijkstra(dynSssp, dyn_event)))
 
     # controllo che l'arco sia stato aggiunto in entrambi i grafi
-    assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
-    # controllo che il peso dell'arco aggiunto sia uguale in entrambi i grafi
-    assert localGraph.weight(from_node, to_node) == dyn_localGraph.weight(from_node, to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
+        # controllo che il peso dell'arco aggiunto sia uguale in entrambi i grafi
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.weight(from_node, to_node) == dyn_localGraph.weight(from_node, to_node)
 
     # controllo che i cammini minimi siano uguali 
-    assert dynSssp.distance(to_node) == sssp.distance(to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert dynSssp.distance(to_node) == sssp.distance(to_node)
 
     # # se i path son diversi e' sufficiente che abbiano la stessa distanza
+    #      if logger.isEnabledFor(logging.DEBUG):
     # assert dynSssp.getPath(to_node)  == sssp.getPath(to_node)
 
     # controllo che il peso totale dei due grafi sia uguale
-    assert localGraph.totalEdgeWeight() == dyn_localGraph.totalEdgeWeight()
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.totalEdgeWeight() == dyn_localGraph.totalEdgeWeight()
 
     return edge_addition_counter
 
@@ -167,8 +178,12 @@ def handleEdgeRemovalEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, sta
     # If uniformDistribution is set to True, the edge is selected uniformly at random.
     from_node, to_node = networkit.graphtools.randomEdge(localGraph, True)
     new_weight = MAX_EDGE_WEIGHT
-    assert localGraph.hasEdge(from_node, to_node) == True
-    assert dyn_localGraph.hasEdge(from_node, to_node) == True
+
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.hasEdge(from_node, to_node) == True
+    if logger.isEnabledFor(logging.DEBUG):
+        assert dyn_localGraph.hasEdge(from_node, to_node) == True
+
     localGraph.setWeight(from_node, to_node, new_weight)
     dyn_localGraph.setWeight(from_node, to_node, new_weight)
     static_computing_time_list.append(("EDGE_REMOVAL", computeDijkstra(sssp)))
@@ -176,20 +191,26 @@ def handleEdgeRemovalEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, sta
     # poiche' DynDijkstra non supporta l' evento EDGE_REMOVAL
     dyn_event = networkit.dynamic.GraphEvent(networkit.dynamic.GraphEvent.EDGE_WEIGHT_UPDATE, from_node, to_node, new_weight)
     dynamic_computing_time_list.append(("EDGE_REMOVAL", computeDynDijkstra(dynSssp, dyn_event)))
+    
     # controllo che l'arco sia stato aggiunto in entrambi i grafi
-    assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
     # controllo che il peso dell'arco aggiunto sia uguale in entrambi i grafi
-    assert localGraph.weight(from_node, to_node) == dyn_localGraph.weight(from_node, to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.weight(from_node, to_node) == dyn_localGraph.weight(from_node, to_node)
     # controllo che i cammini minimi siano uguali 
-    assert dynSssp.distance(to_node) == sssp.distance(to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert dynSssp.distance(to_node) == sssp.distance(to_node)
 
-    if(dynSssp.distance(to_node) != sssp.distance(to_node)):
-        if logger.isEnabledFor(logging.DEBUG):
+    if logger.isEnabledFor(logging.DEBUG):
+        if(dynSssp.distance(to_node) != sssp.distance(to_node)):
             logger.debug(f"assert error: dynSssp.distance != sssp.distance")
 
     # controllo che il peso totale dei due grafi sia uguale
-    assert localGraph.totalEdgeWeight() == dyn_localGraph.totalEdgeWeight()
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.totalEdgeWeight() == dyn_localGraph.totalEdgeWeight()
     # se i path son diversi e' sufficiente che abbiano la stessa distanza
+    #      if logger.isEnabledFor(logging.DEBUG):
     # assert dynSssp.getPath(to_node)  == sssp.getPath(to_node)
 
 # calcola ed inserisce il RunningTime impiegato da Dijkstra e DynDijkstra per calcolare SSSP a fronte di un
@@ -213,14 +234,19 @@ def handleEdgeWeightIncrementEvent(event, localGraph, dyn_localGraph, sssp, dynS
     dyn_event = networkit.dynamic.GraphEvent(networkit.dynamic.GraphEvent.EDGE_WEIGHT_UPDATE, from_node, to_node, new_weight)
     dynamic_computing_time_list.append(("EDGE_WEIGHT_INCREMENT", computeDynDijkstra(dynSssp, dyn_event)))
     # controllo che l'arco sia stato aggiunto in entrambi i grafi
-    assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
     # controllo che il peso dell'arco aggiunto sia uguale in entrambi i grafi
-    assert localGraph.weight(from_node, to_node) == dyn_localGraph.weight(from_node, to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.weight(from_node, to_node) == dyn_localGraph.weight(from_node, to_node)
     # controllo che i cammini minimi siano uguali 
-    assert dynSssp.distance(to_node) == sssp.distance(to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert dynSssp.distance(to_node) == sssp.distance(to_node)
     # controllo che il peso totale dei due grafi sia uguale
-    assert localGraph.totalEdgeWeight() == dyn_localGraph.totalEdgeWeight()
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.totalEdgeWeight() == dyn_localGraph.totalEdgeWeight()
     # se i path son diversi e' sufficiente che abbiano la stessa distanza
+    #      if logger.isEnabledFor(logging.DEBUG):
     # assert dynSssp.getPath(to_node)  == sssp.getPath(to_node)
 
 # calcola ed inserisce il RunningTime impiegato da Dijkstra e DynDijkstra per calcolare SSSP a fronte di un
@@ -247,14 +273,19 @@ def handleEdgeWeightUpdateEvent(event, localGraph, dyn_localGraph, sssp, dynSssp
     dynamic_computing_time_list.append(("EDGE_WEIGHT_DECREMENT", result))
 
     # controllo che l'arco sia stato aggiunto in entrambi i grafi
-    assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
     # controllo che il peso dell'arco aggiunto sia uguale in entrambi i grafi
-    assert localGraph.weight(from_node, to_node) == dyn_localGraph.weight(from_node, to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.weight(from_node, to_node) == dyn_localGraph.weight(from_node, to_node)
     # controllo che i cammini minimi siano uguali 
-    assert dynSssp.distance(to_node) == sssp.distance(to_node)
+    if logger.isEnabledFor(logging.DEBUG):
+        assert dynSssp.distance(to_node) == sssp.distance(to_node)
     # controllo che il peso totale dei due grafi sia uguale
-    assert localGraph.totalEdgeWeight() == dyn_localGraph.totalEdgeWeight()
+    if logger.isEnabledFor(logging.DEBUG):
+        assert localGraph.totalEdgeWeight() == dyn_localGraph.totalEdgeWeight()
     # se i path son diversi e' sufficiente che abbiano la stessa distanza
+    #      if logger.isEnabledFor(logging.DEBUG):
     # assert dynSssp.getPath(to_node)  == sssp.getPath(to_node)
 
 
@@ -403,10 +434,8 @@ def test_DijkstraOnGraphType(graphType):
     dyn_map_result_by_edge = {}
 
     while(True):
-        if(graphType == GraphTypes.BAG):
-            response = parser.getNextBAG()
-        elif(graphType == GraphTypes.ERG):
-            response = parser.getNextERG()
+        
+        response = parser.getNextByType(graphType)
 
         if(response[0] == "no_more_graphs" or response == "not_exist"):
             if logger.isEnabledFor(logging.DEBUG):
@@ -491,7 +520,13 @@ if __name__ == "__main__":
 
     # test_Dijkstra_on_BAGs()
     # test_Dijkstra_on_ERGs()
+
+    start = time.process_time()
+    # test_DijkstraOnGraphType(GraphTypes.BAG)
     test_DijkstraOnGraphType(GraphTypes.BAG)
+    if logger.isEnabledFor(logging.INFO):
+        logger.info(f"Experiments ended in {time.process_time() - start} seconds")
+
 
     # valutare la media dei rapporti (speedup x ogni esecuzione)
     # e stessa cosa per il cambio del nodo sorgente

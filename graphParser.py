@@ -93,6 +93,45 @@ class file_Parser:
         self._ERG_iter = 0
 
 
+    # ritorna una tupla [indice, networkit.graph, missing_edge_list] finche' non terminano i file contenenti i grafi BAG
+    def getNextByType(self, graphType):
+        if(isinstance(graphType, utility.GraphTypes) == False):
+            return
+
+        if(graphType == utility.GraphTypes.BAG and self._BAG_iter < len(self.BAGs_file_path)):
+            index = self._BAG_iter
+
+            if(os.path.isfile(self.BAGs_file_path[index])):
+                graph = networkit.readGraph(self.BAGs_file_path[index], networkit.Format.EdgeListTabOne)
+            else:
+                return "not_exist"
+
+            if(os.path.isfile(self.BAGs_missing_edges_file_path[index])):
+                missing_edges = pandas.read_json(self.BAGs_missing_edges_file_path[index])
+            else:
+                return "not_exist"
+
+            self._BAG_iter += 1
+            return [index, graph, missing_edges]
+        elif(graphType == utility.GraphTypes.ERG and self._ERG_iter < len(self.ERGs_file_path)):
+            index = self._ERG_iter
+
+            if(os.path.isfile(self.ERGs_file_path[index])):
+                graph = networkit.readGraph(self.ERGs_file_path[index], networkit.Format.EdgeListTabOne)
+            else:
+                return "not_exist"
+
+            if(os.path.isfile(self.ERGs_missing_edges_file_path[index])):
+                missing_edges = pandas.read_json(self.ERGs_missing_edges_file_path[index])
+            else:
+                return "not_exist"
+
+            self._ERG_iter += 1
+            return [index, graph, missing_edges]
+
+        else:
+            return "no_more_graphs"
+
 
 def test_getNextBAG():
     parser = file_Parser()
