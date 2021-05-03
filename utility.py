@@ -30,6 +30,9 @@ STATIC_RESULT_FOLDER = "Result/Static"
 DYNAMIC_RESULT_FOLDER = "Result/Dynamic"
 FILE_TYPE = ".json"
 
+BAGs_FOLDER = "BarabasiAlbertGraphs"
+ERGs_FOLDER = "ErdosRenyiGraphs"
+
 # MAIN.PY SETTING
 COMPUTE_FIRST_ALGO_RUN = False
 COMPUTE_PROCESS_TIME = False

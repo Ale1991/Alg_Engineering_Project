@@ -68,12 +68,63 @@ def genAndStoreSingleErdosRenyiGraph(nMax, prob, index):
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"missingEdge_{index} saved in {time.time() - start_missing}")
 
-def genDefaultBAG():
+
+
+
+
+# genero grafo, salvo grafo, calcolo missingEdge e salvo missingEdge
+def generateERG(nMax, prob):  
+    # ErdosRenyiGenerator(count nNodes, double prob, directed = False, selfLoops = False)
+    # nMax # -> Number of nodes n in the graph. 
+    # prob # -> Probability of existence for each edge p.
+    directed = False # -> FIXED PARAMETER: Generates a directed
+    selfLoops = False # -> FIXED PARAMETER: Allows self-loops to be generated (only for directed graphs)
+
+    start = time.time()
+    erg = networkit.generators.ErdosRenyiGenerator(nMax, prob, directed, selfLoops).generate()
+
+    weighted_erg = networkit.graphtools.toWeighted(erg)
+    # assegno agli archi di ciascun grafo pesi random compresi fra MIN_EDGE_WEIGHT e MAX_EDGE_WEIGHT
+    random_weighted_erg = utility.getRandomWeightedGraph(weighted_erg, MIN_EDGE_WEIGHT, MAX_EDGE_WEIGHT)
+
+    return random_weighted_erg
+
+# genero grafo, salvo grafo, calcolo missingEdge e salvo missingEdge
+def storeERG(graph, index):
+    start = time.time()
+    # salvo i grafi su file
+    networkit.graphio.writeGraph(graph, f"{utility.ERGs_FOLDER}/ERG_{index}.TabOne", networkit.Format.EdgeListTabOne)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"ERG_{index}.TabOne saved in {time.time() - start}")
+
+# BAG: ErdosRenyiGraph
+def storeERG_MissingEdges(graph, index):
+    # per ogni grafo ErdosRenyi, viene calcolata la lista di archi mancanti al grafo
+    # il numero di archi e' fissato
+    # infine, tale lista viene salvata in un file json missingEdgeForBAG_x.json
+    # dove x fa riferimento al grafo precedentemente generato e salvato con nome BAG_x.TabOne
+    nodes = graph.numberOfNodes()
+    edges = graph.numberOfEdges()
+    max_edges =  (nodes * (nodes - 1) / 2) 
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"G=({nodes},{edges}), max_edges: {max_edges} edge_to_compute: {FIXED_EDGE_NUMBER}")
+    missingEdges = utility.getMissingEdgeRandomlyFromGraph(graph, FIXED_EDGE_NUMBER, MIN_EDGE_WEIGHT, MAX_EDGE_WEIGHT)
+    
+    assert edges + len(missingEdges) <= max_edges
+    df = pandas.DataFrame(missingEdges, columns =['from_node', 'to_node', 'weight'])
+    pandas.DataFrame.to_json(df, f"{utility.ERGs_FOLDER}/missingEdgeForERG_{index}.json", indent=4)
+
+def genDefaultERG():
     inputSet = utility.getInputSetByDoubling(N_GRAPH, MIN_NODES, MIN_PROB, doubleNodes=True, doubleEdges=False)
     for input in inputSet:
         nMax, prob = input
-        genAndStoreSingleErdosRenyiGraph(nMax, prob, inputSet.index(input)+1)
+        index = inputSet.index(input)+1
+        graph = generateERG(nMax, prob)
+        storeERG(graph, index)
+        storeERG_MissingEdges(graph, index)
 
 
 if __name__ == "__main__":
-    genDefaultBAG()
+    genDefaultERG()
