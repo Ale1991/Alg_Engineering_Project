@@ -1,12 +1,12 @@
-import networkit, pandas, sys, logging, os
+import networkit, pandas, sys, logging, os, utility
 
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("graphParser")
 logger.setLevel(logging.DEBUG)
 
 class file_Parser:
-    BAG_folder = "BarabasiAlbertGraphs/"
-    ERG_folder = "ErdosRenyiGraphs/"
+    BAG_folder = utility.BAGs_FOLDER # "BarabasiAlbertGraphs/"
+    ERG_folder = utility.ERGs_FOLDER # "ErdosRenyiGraphs/"
 
     BAGs_file_path = []
     BAGs_missing_edges_file_path = []
