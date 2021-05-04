@@ -9,7 +9,7 @@ from numpy.core.fromnumeric import sort
 
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("plotResult")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 # algo_type = static/dynamic
 # type = GraphTypes

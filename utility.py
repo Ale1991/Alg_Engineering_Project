@@ -1,4 +1,4 @@
-import random
+import random, os
 
 N_GRAPH = 6 # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
 MIN_NODES = 500 # minimum Number of nodes in the graph
@@ -30,8 +30,8 @@ STATIC_RESULT_FOLDER = "Result/Static"
 DYNAMIC_RESULT_FOLDER = "Result/Dynamic"
 FILE_TYPE = ".json"
 
-BAGs_FOLDER = "BarabasiAlbertGraphs"
-ERGs_FOLDER = "ErdosRenyiGraphs"
+BAGs_FOLDER = os.path.join(os.getcwd(),"BarabasiAlbertGraphs")
+ERGs_FOLDER = os.path.join(os.getcwd(),"ErdosRenyiGraphs")
 
 # MAIN.PY SETTING
 COMPUTE_FIRST_ALGO_RUN = False
