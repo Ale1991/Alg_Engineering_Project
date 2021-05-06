@@ -124,25 +124,8 @@ def genGraphByType(graphType):
         storeGraphByType(graph, index, graphType) # salvo l'i-esimo grafo
         storeMissingEdgesByType(graph, index, graphType) # calcolo e salvo gli archi mancanti dell'i-esimo grafo
 
-def clearFolderByType(graphType):
-    if(isinstance(graphType, utility.GraphTypes) == False):
-        return
-
-    import os
-    if(graphType == utility.GraphTypes.BAG):
-        folder = utility.BAGs_FOLDER
-    elif(graphType == utility.GraphTypes.ERG):
-        folder = utility.ERGs_FOLDER
-
-    type = graphType.Name()
-
-    for root, dirs, files in os.walk(folder):
-        for file in files:
-            if(file.__contains__(type)):   
-                os.remove(os.path.join(root, file))
-
 if __name__ == "__main__":
-    clearFolderByType(utility.GraphTypes.BAG)
+    utility.clearFolderByType(utility.BAGs_FOLDER, utility.GraphTypes.BAG)
     genGraphByType(utility.GraphTypes.BAG)
-    # clearFolderByType(utility.GraphTypes.ERG)
+
     # genGraphByType(utility.GraphTypes.ERG)

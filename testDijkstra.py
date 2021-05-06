@@ -1,4 +1,4 @@
-from utility import GraphTypes, MAX_EDGE_WEIGHT, MIN_EDGE_WEIGHT
+from utility import ERGs_FOLDER, GraphTypes, MAX_EDGE_WEIGHT, MIN_EDGE_WEIGHT
 import logging, time, numpy, random, networkit, graphParser, copy, sys, timeit, pandas, utility
 
 logging.basicConfig(stream=sys.stderr)
@@ -369,13 +369,14 @@ def saveResult(map, resultType):
     # (event, running time)
     result_list = map['result_list']
 
+
     # columns=['graph_type', 'graph_number', 'nodes', 'edges', 'result_list']
     df = pandas.DataFrame([map])
 
     if(resultType == utility.ResultType.Static):
-        pandas.DataFrame.to_json(df, f"{utility.STATIC_RESULT_FOLDER}/{graph_type}_{graph_number}.json", indent=4, orient='records')
+        pandas.DataFrame.to_json(df, f"{utility.STATIC_RESULT_FOLDER}/{graph_type}_{graph_number}{utility.RESULT_FILE_TYPE}", indent=4, orient='records')
     elif(resultType == utility.ResultType.Dynamic):
-        pandas.DataFrame.to_json(df, f"{utility.DYNAMIC_RESULT_FOLDER}/{graph_type}_{graph_number}.json", indent=4, orient='records')
+        pandas.DataFrame.to_json(df, f"{utility.DYNAMIC_RESULT_FOLDER}/{graph_type}_{graph_number}{utility.RESULT_FILE_TYPE}", indent=4, orient='records')
 
 
 if __name__ == "__main__":
@@ -387,6 +388,8 @@ if __name__ == "__main__":
 
     # test_Dijkstra_on_BAGs()
     # test_Dijkstra_on_ERGs()
+
+    utility.clearFolderByType(utility.STATIC_RESULT_FOLDER, GraphTypes.ERG)
 
     start = time.process_time()
     # test_DijkstraOnGraphByType(GraphTypes.BAG)

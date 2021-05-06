@@ -23,7 +23,7 @@ def readResultFromFile(algo_type, graph_type, index):
     else:
         pass # error
 
-    searchingFile = (graph_type.Name() + "_" + index.__str__() + utility.FILE_TYPE)
+    searchingFile = (graph_type.Name() + "_" + index.__str__() + utility.RESULT_FILE_TYPE)
 
     for root, dirs, files in os.walk(folder):
         for file in files:

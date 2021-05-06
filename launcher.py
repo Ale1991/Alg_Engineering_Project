@@ -1,4 +1,4 @@
-import argparse, utility
+import argparse, utility, sys
 
 parser = argparse.ArgumentParser(prog='launcher.py', description="Dijkstra versus DynDijkstra")
 parser.add_argument( '-g', '--genGraphs',   nargs='?', metavar='GraphType', choices=('BAG','ERG'), help='generate files containing graph with types: {%(choices)s}')
@@ -7,6 +7,10 @@ parser.add_argument( '-p', '--plotResults', nargs='?', metavar='GraphType', choi
 
 def main():
     args = parser.parse_args()
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        return # sys.exit()
 
     genGraphs = args.genGraphs
     runDijkstra = args.runDijkstra
@@ -17,20 +21,24 @@ def main():
     if(genGraphs != None):
         import genGraph
         if genGraphs == 'BAG':
-            genGraph.clearFolderByType(utility.GraphTypes.BAG)
+            utility.clearFolderByType(utility.BAGs_FOLDER , utility.GraphTypes.BAG)
             genGraph.genGraphByType(utility.GraphTypes.BAG)
         elif genGraphs == 'ERG':
-            genGraph.clearFolderByType(utility.GraphTypes.ERG)
+            utility.clearFolderByType(utility.ERGs_FOLDER, utility.GraphTypes.ERG)
             genGraph.genGraphByType(utility.GraphTypes.ERG)
         print(f"{genGraphs} Graphs generated")
-    elif(runDijkstra != None):
+    if(runDijkstra != None):
         import testDijkstra
         if runDijkstra == 'BAG':
+            utility.clearFolderByType(utility.STATIC_RESULT_FOLDER, utility.GraphTypes.BAG)
+            utility.clearFolderByType(utility.DYNAMIC_RESULT_FOLDER, utility.GraphTypes.BAG)
             testDijkstra.test_DijkstraOnGraphByType(utility.GraphTypes.BAG)
         elif runDijkstra == 'ERG':
+            utility.clearFolderByType(utility.STATIC_RESULT_FOLDER, utility.GraphTypes.ERG)
+            utility.clearFolderByType(utility.DYNAMIC_RESULT_FOLDER, utility.GraphTypes.ERG)
             testDijkstra.test_DijkstraOnGraphByType(utility.GraphTypes.ERG)
         print(f"{genGraphs} Dijkstra computed")
-    elif(plotResults != None):
+    if(plotResults != None):
         import plotResult
         if plotResults == 'BAG':
             plotResult.plotGraphByType(utility.GraphTypes.BAG)

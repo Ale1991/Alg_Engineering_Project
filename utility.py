@@ -1,6 +1,6 @@
 import random, os
 
-N_GRAPH = 6 # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
+N_GRAPH = 4 # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
 MIN_NODES = 500 # minimum Number of nodes in the graph
 MIN_K = 4 # minimum Number of attachments per node
 MIN_PROB = 0.02# minimum Probability of existence for each edge
@@ -26,9 +26,9 @@ class DijkstraAlgoTypes(Enum):
     def Name(self):
         return self.name
 
-STATIC_RESULT_FOLDER = "Result/Static"
-DYNAMIC_RESULT_FOLDER = "Result/Dynamic"
-FILE_TYPE = ".json"
+STATIC_RESULT_FOLDER = os.path.join(os.getcwd(),"Result/Static")
+DYNAMIC_RESULT_FOLDER = os.path.join(os.getcwd(),"Result/Dynamic")
+RESULT_FILE_TYPE = ".json"
 
 BAGs_FOLDER = os.path.join(os.getcwd(),"BarabasiAlbertGraphs")
 ERGs_FOLDER = os.path.join(os.getcwd(),"ErdosRenyiGraphs")
@@ -36,7 +36,7 @@ ERGs_FOLDER = os.path.join(os.getcwd(),"ErdosRenyiGraphs")
 # MAIN.PY SETTING
 COMPUTE_FIRST_ALGO_RUN = False
 COMPUTE_PROCESS_TIME = False
-GRAPH_TO_CHECK = 6
+GRAPH_TO_CHECK = 4
 # e'  il numero di eventi randomici che avvengono ad ogni esperimento di dijkstra (per ogni grafo)
 EVENT_NUMBER_IN_EXP = 4000
 
@@ -94,3 +94,16 @@ def getInputSetByDoubling(nGraph, minNodes, minK, doubleNodes=True, doubleEdges=
     inputSet = [(n,k) for n in nodesSize for k in kSize]
     assert len(inputSet) == len(nodesSize) * len(kSize)
     return inputSet
+
+def clearFolderByType(folder, graphType):
+    if(isinstance(graphType, GraphTypes) == False):
+        return
+
+    import os
+
+    type = graphType.Name()
+
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            if(file.__contains__(type)):   
+                os.remove(os.path.join(root, file))
