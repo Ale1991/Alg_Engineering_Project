@@ -2,7 +2,7 @@ import networkit, pandas, sys, logging, os, utility
 
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("graphParser")
-logger.setLevel(logging.INFO)
+logger.setLevel(utility.DEBUG)
 
 class file_Parser:
     BAG_folder = utility.BAGs_FOLDER # "BarabasiAlbertGraphs/"

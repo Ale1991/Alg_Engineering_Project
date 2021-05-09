@@ -1,11 +1,13 @@
-import random, os
+import random, os, logging
 
-N_GRAPH = 4 # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
+DEBUG = logging.INFO
+
+N_GRAPH = 6 # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
 MIN_NODES = 500 # minimum Number of nodes in the graph
-MIN_K = 4 # minimum Number of attachments per node
+MIN_K = 2 # minimum Number of attachments per node
 MIN_PROB = 0.02# minimum Probability of existence for each edge
 
-FIXED_EDGE_NUMBER = 6000
+FIXED_EDGE_NUMBER = 20000
 
 MIN_EDGE_WEIGHT =  1
 MAX_EDGE_WEIGHT = 1000
@@ -36,9 +38,9 @@ ERGs_FOLDER = os.path.join(os.getcwd(),"ErdosRenyiGraphs")
 # MAIN.PY SETTING
 COMPUTE_FIRST_ALGO_RUN = False
 COMPUTE_PROCESS_TIME = False
-GRAPH_TO_CHECK = 4
+GRAPH_TO_CHECK = N_GRAPH
 # e'  il numero di eventi randomici che avvengono ad ogni esperimento di dijkstra (per ogni grafo)
-EVENT_NUMBER_IN_EXP = 4000
+EVENT_NUMBER_IN_EXP = 35000
 
 
 class ResultType(Enum):

@@ -3,7 +3,7 @@ import logging, time, numpy, random, networkit, graphParser, copy, sys, timeit, 
 
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("testDijkstra")
-logger.setLevel(logging.INFO)
+logger.setLevel(utility.DEBUG)
 
 
 # return random(networkit.dynamic.GraphEvent.EDGE_ADDITION, networkit.dynamic.GraphEvent.EDGE_WEIGHT_UPDATE)
@@ -106,12 +106,12 @@ def DijkstraWithRandomEventTest(graph, event_number, missing_edge_to_add):
         if(event == networkit.dynamic.GraphEvent.EDGE_ADDITION):
             edge_addition_counter = handleEdgeAdditionEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list,
             edge_addition_counter, missing_edge_to_add)
-        elif(event == networkit.dynamic.GraphEvent.EDGE_REMOVAL):
-            handleEdgeRemovalEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list)
-        elif(event == networkit.dynamic.GraphEvent.EDGE_WEIGHT_INCREMENT):
-            handleEdgeWeightIncrementEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list)
-        elif(event == networkit.dynamic.GraphEvent.EDGE_WEIGHT_UPDATE):
-            handleEdgeWeightUpdateEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list)
+        # elif(event == networkit.dynamic.GraphEvent.EDGE_REMOVAL):
+        #     handleEdgeRemovalEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list)
+        # elif(event == networkit.dynamic.GraphEvent.EDGE_WEIGHT_INCREMENT):
+        #     handleEdgeWeightIncrementEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list)
+        # elif(event == networkit.dynamic.GraphEvent.EDGE_WEIGHT_UPDATE):
+        #     handleEdgeWeightUpdateEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list)
         
     return [static_computing_time_list, dynamic_computing_time_list]
 

@@ -27,7 +27,7 @@ import networkit, pandas, time, sys, logging, utility
 
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("genGraph")
-logger.setLevel(logging.INFO)
+logger.setLevel(utility.DEBUG)
 
 N_GRAPH = utility.N_GRAPH # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
 MIN_NODES = utility.MIN_NODES # minimum Number of nodes in the graph

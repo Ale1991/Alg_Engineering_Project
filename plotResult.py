@@ -9,7 +9,7 @@ from numpy.core.fromnumeric import sort
 
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("plotResult")
-logger.setLevel(logging.INFO)
+logger.setLevel(utility.DEBUG)
 
 # algo_type = static/dynamic
 # type = GraphTypes
@@ -432,6 +432,7 @@ def plotAvgSpeedUp(speedUp_list):
     ax.set_ylabel('speedup', fontsize=10)
 
     all_graph = []
+
     for iter in range(1,utility.GRAPH_TO_CHECK+1):
         graph_speedup = [speedUp_list[x] for x in range(iter * utility.EVENT_NUMBER_IN_EXP)]
         avg = numpy.average(graph_speedup)
@@ -439,6 +440,24 @@ def plotAvgSpeedUp(speedUp_list):
 
     x = [x for x in range(1,utility.GRAPH_TO_CHECK+1)]
     plt.plot(x, all_graph, marker="o", c = 'r')
+
+    # ax.plot(x, speedUp_list, marker="o", label= "staticDijkstraRT/dynDijkstraRT")
+    # ax.legend()
+    plt.show()
+
+def plotNewAvgSpeedUp(result_list):
+    fig, ax = plt.subplots(figsize=(10, 10))
+    fig.suptitle('graph vs speedup', fontsize=20)
+
+    ax.set_xlabel('graph number', fontsize=10)
+    ax.set_ylabel('speedup', fontsize=10)
+
+    # result_list = ["GraphType", index, #nodes, #edges, speedUp_list]
+    all_graph_speedup = [numpy.average(tuple[4]) for tuple in result_list]
+    # x = [x for x in range(1,len(result_list)+1)]
+    x = [tuple[2] for tuple in result_list]
+
+    plt.plot(x, all_graph_speedup, marker="o", c = 'r')
 
     # ax.plot(x, speedUp_list, marker="o", label= "staticDijkstraRT/dynDijkstraRT")
     # ax.legend()
@@ -478,6 +497,8 @@ def plotGraphByType(graphType):
 
     avg_SpeedUp = []
     len_counter = 0
+
+    new_avg_SpeedUp = []
     for index in range(utility.GRAPH_TO_CHECK):
 
         # da qui ciclo per tutti i file per ricostruire le dyn_map_result_by_nodes da dare in pasto alle plot func
@@ -518,10 +539,13 @@ def plotGraphByType(graphType):
             dyn_map_result_by_node[(nodes, edges, total_weight)] = (np_dyn_avg, np_dyn_var)
             dyn_map_result_by_edge[(edges, nodes, total_weight)] = (np_dyn_avg, np_dyn_var)
 
+            local_speedup = []
             for i in range(len(dynamic_result_list)):
                 if(dynamic_result_list[i][0] == static_result_list[i][0]):
                     speedup = static_result_list[i][1]/dynamic_result_list[i][1]
                     avg_SpeedUp.append(speedup)
+                    local_speedup.append(speedup)
+            new_avg_SpeedUp.append([graph_type, graph_number, nodes, edges, local_speedup])
 
             len_counter += len(dynamic_result_list)
             if(len(avg_SpeedUp) == len_counter):
@@ -534,8 +558,11 @@ def plotGraphByType(graphType):
         
 
     # plotAllSpeedUp(avg_SpeedUp)
-    if(len(avg_SpeedUp) > 0):
-        plotAvgSpeedUp(avg_SpeedUp)
+    # if(len(avg_SpeedUp) > 0):
+    #     plotAvgSpeedUp(avg_SpeedUp)
+
+    if(len(new_avg_SpeedUp) > 0):
+        plotNewAvgSpeedUp(new_avg_SpeedUp)
 
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug('finish')
