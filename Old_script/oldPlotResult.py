@@ -517,7 +517,8 @@ def plotGraphByType(graphType):
             np_avg = numpy.average(cmp_array)
             np_var = numpy.var(cmp_array, dtype=numpy.float64)
 
-            # valutare la media dei rapporti (speedup x ogni esecuzione) e non i rapporti delle medie
+            # valutare la media dei rapporti (speedup x ogni esecuzione)
+            # e stessa cosa per il cambio del nodo sorgente
 
             map_result_by_node[(nodes, edges, total_weight)] = (np_avg, np_var)
             map_result_by_edge[(edges, nodes, total_weight)] = (np_avg, np_var)
@@ -556,7 +557,7 @@ def plotGraphByType(graphType):
 
         
 
-    plotAllSpeedUp(avg_SpeedUp)
+    # plotAllSpeedUp(avg_SpeedUp)
     # if(len(avg_SpeedUp) > 0):
     #     plotAvgSpeedUp(avg_SpeedUp)
 
@@ -574,4 +575,4 @@ if __name__ == "__main__":
     # 4 cambi di tipologia di grafi (barabasi, erdos, qualche grafo reale)
     # grafici con running time (ordinate) ascisse ( vertici,archi, densita)
     # plotAll()
-    plotGraphByType(utility.GraphTypes.BAG)
+    plotGraphByType(utility.GraphTypes.ERG)
