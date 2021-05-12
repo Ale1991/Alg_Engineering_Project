@@ -98,10 +98,12 @@ def DijkstraWithRandomEventTest(graph, event_number, missing_edge_to_add):
         event = getRandomGraphEdgeEvent()
 
         # scelgo randomicamente un nodo sorgente da cui calcolare sssp per ammortizzare il bias
-        random_source_node = 0 # networkit.graphtools.randomNode(localGraph)
+        random_source_node = networkit.graphtools.randomNode(localGraph)
 
         sssp.setSource(random_source_node)
+        sssp.run()
         dynSssp.setSource(random_source_node)
+        dynSssp.run()
 
         if(event == networkit.dynamic.GraphEvent.EDGE_ADDITION):
             edge_addition_counter = handleEdgeAdditionEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list,
@@ -110,8 +112,8 @@ def DijkstraWithRandomEventTest(graph, event_number, missing_edge_to_add):
         #     handleEdgeRemovalEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list)
         # elif(event == networkit.dynamic.GraphEvent.EDGE_WEIGHT_INCREMENT):
         #     handleEdgeWeightIncrementEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list)
-        # elif(event == networkit.dynamic.GraphEvent.EDGE_WEIGHT_UPDATE):
-        #     handleEdgeWeightUpdateEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list)
+        elif(event == networkit.dynamic.GraphEvent.EDGE_WEIGHT_UPDATE):
+            handleEdgeWeightUpdateEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list)
         
     return [static_computing_time_list, dynamic_computing_time_list]
 
@@ -120,7 +122,6 @@ def DijkstraWithRandomEventTest(graph, event_number, missing_edge_to_add):
 def handleEdgeAdditionEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, static_computing_time_list, dynamic_computing_time_list, edge_addition_counter, missing_edge_to_add):
     if logger.isEnabledFor(logging.DEBUG):
         assert localGraph.numberOfNodes() == dyn_localGraph.numberOfNodes()
-    if logger.isEnabledFor(logging.DEBUG):
         assert localGraph.numberOfEdges() == dyn_localGraph.numberOfEdges()
 
     # COMMENTED PER EVITARE DI PRENDERE ARCHI MANCANTI DAI FILE JSON PRECALCOLATI
@@ -136,8 +137,6 @@ def handleEdgeAdditionEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, st
     # controllo che i nodi dell'arco da aggiungere siano diversi
     if logger.isEnabledFor(logging.DEBUG):
         assert from_node != to_node
-
-    if logger.isEnabledFor(logging.DEBUG):
         assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
             
     # EDGE ADDITION EVENT
@@ -154,19 +153,12 @@ def handleEdgeAdditionEvent(event, localGraph, dyn_localGraph, sssp, dynSssp, st
     if logger.isEnabledFor(logging.DEBUG):
         assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
         # controllo che il peso dell'arco aggiunto sia uguale in entrambi i grafi
-    if logger.isEnabledFor(logging.DEBUG):
         assert localGraph.weight(from_node, to_node) == dyn_localGraph.weight(from_node, to_node)
-
-    # controllo che i cammini minimi siano uguali 
-    if logger.isEnabledFor(logging.DEBUG):
+        # controllo che i cammini minimi siano uguali 
         assert dynSssp.distance(to_node) == sssp.distance(to_node)
-
-    # # se i path son diversi e' sufficiente che abbiano la stessa distanza
-    #      if logger.isEnabledFor(logging.DEBUG):
-    # assert dynSssp.getPath(to_node)  == sssp.getPath(to_node)
-
-    # controllo che il peso totale dei due grafi sia uguale
-    if logger.isEnabledFor(logging.DEBUG):
+        # se i path son diversi e' sufficiente che abbiano la stessa distanza
+        # assert dynSssp.getPath(to_node)  == sssp.getPath(to_node)
+        # controllo che il peso totale dei due grafi sia uguale
         assert localGraph.totalEdgeWeight() == dyn_localGraph.totalEdgeWeight()
 
     return edge_addition_counter
@@ -275,30 +267,20 @@ def handleEdgeWeightUpdateEvent(event, localGraph, dyn_localGraph, sssp, dynSssp
     # controllo che l'arco sia stato aggiunto in entrambi i grafi
     if logger.isEnabledFor(logging.DEBUG):
         assert localGraph.hasEdge(from_node,to_node) == dyn_localGraph.hasEdge(from_node, to_node)
-    # controllo che il peso dell'arco aggiunto sia uguale in entrambi i grafi
-    if logger.isEnabledFor(logging.DEBUG):
+        # controllo che il peso dell'arco aggiunto sia uguale in entrambi i grafi
         assert localGraph.weight(from_node, to_node) == dyn_localGraph.weight(from_node, to_node)
-    # controllo che i cammini minimi siano uguali 
-    if logger.isEnabledFor(logging.DEBUG):
+        # controllo che i cammini minimi siano uguali 
         assert dynSssp.distance(to_node) == sssp.distance(to_node)
-    # controllo che il peso totale dei due grafi sia uguale
-    if logger.isEnabledFor(logging.DEBUG):
+        # controllo che il peso totale dei due grafi sia uguale
         assert localGraph.totalEdgeWeight() == dyn_localGraph.totalEdgeWeight()
-    # se i path son diversi e' sufficiente che abbiano la stessa distanza
-    #      if logger.isEnabledFor(logging.DEBUG):
-    # assert dynSssp.getPath(to_node)  == sssp.getPath(to_node)
+        # se i path son diversi e' sufficiente che abbiano la stessa distanza
+        # assert dynSssp.getPath(to_node)  == sssp.getPath(to_node)
 
 def test_DijkstraOnGraphByType(graphType):
     if(isinstance(graphType, GraphTypes) == False):
         return
 
     parser = graphParser.file_Parser()
-
-    map_result_by_node = {}
-    map_result_by_edge = {}
-
-    dyn_map_result_by_node = {}
-    dyn_map_result_by_edge = {}
 
     while(True):      
         response = parser.getNextByType(graphType)
@@ -315,32 +297,14 @@ def test_DijkstraOnGraphByType(graphType):
 
             static_result_list, dynamic_result_list = DijkstraWithRandomEventTest(graph, utility.EVENT_NUMBER_IN_EXP, randomMissingEdgeList)
 
-            # cmp_array = [x[1] for x in static_result_list]
-
-            # np_avg = numpy.average(cmp_array)
-            # np_var = numpy.var(cmp_array, dtype=numpy.float64)
-
-            # valutare la media dei rapporti (speedup x ogni esecuzione)
-            # e stessa cosa per il cambio del nodo sorgente
-
-            # map_result_by_node[(g0_nodes, g0_edges, g0_totalEdgeWeight)] = (np_avg, np_var)
-            # map_result_by_edge[(g0_edges, g0_nodes, g0_totalEdgeWeight)] = (np_avg, np_var)
-
-
-            # cmp_dyn_array = [x[1] for x in dynamic_result_list]
-
-            # np_dyn_avg = numpy.average(cmp_dyn_array)
-            # np_dyn_var = numpy.var(cmp_dyn_array, dtype=numpy.float64)
-            
-            # dyn_map_result_by_node[(g0_nodes, g0_edges, g0_totalEdgeWeight)] = (np_dyn_avg, np_dyn_var)
-            # dyn_map_result_by_edge[(g0_edges, g0_nodes, g0_totalEdgeWeight)] = (np_dyn_avg, np_dyn_var)
-
             avg_map = {"graph_type" : graphType.Name(),
                         "graph_number" : index,
                         "nodes" : g0_nodes,
                         "edges" : g0_edges,
                         "total_weight" : graph.totalEdgeWeight(),
                         "result_list" : static_result_list}
+            saveResult(avg_map, utility.ResultType.Static)
+            avg_map.clear()
 
             dyn_avg_map = {"graph_type" : graphType.Name(),
                         "graph_number" : index,
@@ -349,13 +313,10 @@ def test_DijkstraOnGraphByType(graphType):
                         "total_weight" : graph.totalEdgeWeight(),
                         "result_list" : dynamic_result_list}
             
-            saveResult(avg_map, utility.ResultType.Static)
             saveResult(dyn_avg_map, utility.ResultType.Dynamic)
+            dyn_avg_map.clear()
         else:
             break
-
-    # plotAll(map_result_by_node, dyn_map_result_by_node, map_result_by_edge,dyn_map_result_by_edge, weighted=True)
-
 
 def saveResult(map, resultType):
     # tipo del grafo, es: generati da BarabasiAlbert -> BAG, generati da ErdosRenyi -> ERG
@@ -363,12 +324,11 @@ def saveResult(map, resultType):
     # numero del grafo, riferito ai grafi letti da file
     graph_number = map['graph_number']
     # numero di nodi del grafo
-    nodes = map['nodes']
+    # nodes = map['nodes']
     # numero di archi del grafo
-    edges = map['edges']
+    # edges = map['edges']
     # (event, running time)
-    result_list = map['result_list']
-
+    # result_list = map['result_list']
 
     # columns=['graph_type', 'graph_number', 'nodes', 'edges', 'result_list']
     df = pandas.DataFrame([map])
@@ -386,9 +346,6 @@ if __name__ == "__main__":
     # 4 cambi di tipologia di grafi (barabasi, erdos, qualche grafo reale)
     # grafici con running time (ordinate) ascisse ( vertici,archi, densita)
 
-    # test_Dijkstra_on_BAGs()
-    # test_Dijkstra_on_ERGs()
-
     utility.clearFolderByType(utility.STATIC_RESULT_FOLDER, GraphTypes.ERG)
 
     start = time.process_time()
@@ -396,7 +353,6 @@ if __name__ == "__main__":
     test_DijkstraOnGraphByType(GraphTypes.ERG)
     if logger.isEnabledFor(logging.INFO):
         logger.info(f"Experiments ended in {time.process_time() - start} seconds")
-
 
     # valutare la media dei rapporti (speedup x ogni esecuzione)
     # e stessa cosa per il cambio del nodo sorgente

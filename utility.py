@@ -7,10 +7,10 @@ MIN_NODES = 500 # minimum Number of nodes in the graph
 MIN_K = 2 # minimum Number of attachments per node
 MIN_PROB = 0.02# minimum Probability of existence for each edge
 
-FIXED_EDGE_NUMBER = 20000
+FIXED_EDGE_NUMBER = 15000
 
 MIN_EDGE_WEIGHT =  1
-MAX_EDGE_WEIGHT = 1000
+MAX_EDGE_WEIGHT = 10000
 
 from enum import Enum
 # BarabasiAlbertGraph, ErdosRenyiGraph
@@ -40,7 +40,7 @@ COMPUTE_FIRST_ALGO_RUN = False
 COMPUTE_PROCESS_TIME = False
 GRAPH_TO_CHECK = N_GRAPH
 # e'  il numero di eventi randomici che avvengono ad ogni esperimento di dijkstra (per ogni grafo)
-EVENT_NUMBER_IN_EXP = 35000
+EVENT_NUMBER_IN_EXP = 25000
 
 
 class ResultType(Enum):
