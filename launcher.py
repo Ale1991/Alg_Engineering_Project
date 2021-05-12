@@ -40,16 +40,17 @@ def main():
         print(f"{genGraphs} Dijkstra computed")
     if(plotResults != None):
         import plotResult
+        data_struct = []
         if plotResults == 'BAG':
-            plotResult.plotGraphByType(utility.GraphTypes.BAG)
+            data_struct = plotResult.GetGraphDataStructByType(utility.GraphTypes.BAG)
         elif plotResults == 'ERG':
-            plotResult.plotGraphByType(utility.GraphTypes.ERG)
+            data_struct = plotResult.GetGraphDataStructByType(utility.GraphTypes.ERG)
+        plotResult.plotAll(data_struct)
         print(f"{genGraphs} Plot ended")
     print(f"test ended in {time.process_time() - start} seconds")
     
 
 
 if __name__ == '__main__':
-
     main()
     
