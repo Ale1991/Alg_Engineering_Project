@@ -1,10 +1,10 @@
 import random, os, logging
 
-DEBUG = logging.INFO
+DEBUG = logging.DEBUG
 
 N_GRAPH = 6 # num^2 di grafi che verranno generati al raddoppiare dei nodi e degli archi
 MIN_NODES = 500 # minimum Number of nodes in the graph
-MIN_K = 2 # minimum Number of attachments per node
+MIN_K = 256 # minimum Number of attachments per node
 MIN_PROB = 0.02# minimum Probability of existence for each edge
 
 FIXED_EDGE_NUMBER = 15000
