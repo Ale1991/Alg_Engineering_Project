@@ -92,6 +92,7 @@ def plotAll(data_struct):
 
 # ascisse => Numero degli eventi di modifica dei grafi
 # ordinate => Tutti speedup(running_time_Dijkstra/running_time_DynDijkstra) calcolati per ogni evento
+# durante un'ispezione visiva dei punti e' emersa una relazione curvilinea tra le variabili => regressione polinomiale
 def plotAllSpeedUp(data_struct):
     # lista contenente una lista di speedup per ogni grafo
     speedUp_list = []
@@ -120,8 +121,10 @@ def plotAllSpeedUp(data_struct):
     predict = numpy.poly1d(model)
     x_lin_reg = range(len(speedUp_list))
     y_lin_reg = predict(x_lin_reg)
-    plt.scatter(x, speedUp_list)
-    plt.plot(x_lin_reg, y_lin_reg, c = 'r')
+    plt.scatter(x, speedUp_list, label="speedup after a single event")
+    line, = plt.plot(x_lin_reg, y_lin_reg, label="polynomial regression model", c = 'b')
+    legend = ax.legend(loc='upper left')
+    # points_legend = ax.legend(handles=[points], loc='center right')
 
 # ascisse => Numero dei nodi del grafo
 # ordinate => media degli speedup(running_time_Dijkstra/running_time_DynDijkstra) per ogni grafo
@@ -142,12 +145,13 @@ def plotNodesSpeedUp(data_struct):
     # lista contenente il numero dei nodi di ogni grafo
     x = [tuple[2] for tuple in data_struct]
 
-    fig, ax = plt.subplots(figsize=(10, 10))
+    fig, ax = plt.subplots()
     fig.suptitle('#Node vs Speedup', fontsize=20)
     ax.set_xlabel('#Nodes', fontsize=10)
     ax.set_ylabel('Speedup', fontsize=10)  
 
-    plt.plot(x, all_graph_speedup, marker="o", c = 'r')
+    line, = ax.plot(x, all_graph_speedup, label="line", marker="o", c = 'r')
+    # legend = ax.legend(handles=[line], loc='center right')
 
 # ascisse => Densita' grafo non orientato: 2m/n*(n-1) # Densita' grafo PESATO non orientato: 2w/n*(n-1)
 # ordinate => media degli speedup(running_time_Dijkstra/running_time_DynDijkstra) per ogni grafo
@@ -230,21 +234,21 @@ def plotDensityRT(data_struct):
     st_y = [x[2] for x in density_index_stRT_dynRT_list]
     dyn_y = [x[3] for x in density_index_stRT_dynRT_list]
 
-    fig, ax = plt.subplots(figsize=(10, 10))
+    fig, (ax1, ax2) = plt.subplots(2)
     fig.suptitle('density vs running time', fontsize=20)
     # SUBPLOT 1
     if(weighted):
-        ax.set_xlabel('2(sum(w))/n*(n-1)', fontsize=10)
+        ax1.set_xlabel('2(sum(w))/n*(n-1)', fontsize=10)
     else:
-        ax.set_xlabel('2*m)/n*(n-1)', fontsize=10)
-    ax.set_ylabel('running time', fontsize=10)
+        ax1.set_xlabel('2*m)/n*(n-1)', fontsize=10)
+    ax1.set_ylabel('running time', fontsize=10)
 
-    plt.plot(x, st_y, marker="o", c = 'b')
-    plt.plot(x, dyn_y, marker="*", c = 'r')
+    line1, = ax1.plot(x, st_y, label="Dijkstra", marker="o", c = 'b')
+    line2, = ax1.plot(x, dyn_y, label="DynDijkstra", marker="*", c = 'r')
+    first_legend = ax1.legend(handles=[line1, line2], loc='center right')
 
-
-    fig2, ax2 = plt.subplots(figsize=(10, 10))
-    fig2.suptitle('density vs running time', fontsize=20)
+    # fig2, ax2 = plt.subplots(figsize=(10, 10))
+    # fig2.suptitle('density vs running time', fontsize=20)
     # SUBPLOT 2
     if(weighted):
         ax2.set_xlabel('2(sum(w))/n*(n-1)', fontsize=10)
@@ -252,7 +256,8 @@ def plotDensityRT(data_struct):
         ax2.set_xlabel('2*m)/n*(n-1)', fontsize=10)
     ax2.set_ylabel('running time', fontsize=10)
 
-    plt.plot(x, dyn_y, marker="*", c = 'r')
+    line3, = ax2.plot(x, dyn_y, label="DynDijkstra", marker="*", c = 'r')
+    second_legend = ax2.legend(handles=[line3], loc='center right')
 
 # ascisse => m + n log n
 # ordinate => media dei Running Time dei due algoritmi per ogni grafo
@@ -284,20 +289,23 @@ def plotAsymptoticRT(data_struct):
     dyn_y = [x[3] for x in index_asym_stRT_dynRT_list]
 
     # SUBPLOT 1
-    fig, ax = plt.subplots(figsize=(10, 10))
+    fig, (ax1, ax2) = plt.subplots(2)
     fig.suptitle('Expected Asymptotic Notation vs Running Time', fontsize=20)  
-    ax.set_xlabel('m + n log n', fontsize=10)
-    ax.set_ylabel('running time', fontsize=10)
-    plt.plot(x, st_y, marker="o", c = 'b')
-    plt.plot(x, dyn_y, marker="*", c = 'r')
+    ax1.set_xlabel('m + n log n', fontsize=10)
+    ax1.set_ylabel('running time', fontsize=10)
+    line1, = ax1.plot(x, st_y, label="Dijkstra", marker="o", c = 'b')
+    line2, = ax1.plot(x, dyn_y, label="DynDijkstra", marker="*", c = 'r')
 
+    first_legend = ax1.legend(handles=[line1, line2], loc='center right')
+    #second_legend = plt.legend(handles=[], loc='upper right')
     # SUBPLOT 2
-    fig2, ax2 = plt.subplots(figsize=(10, 10))
-    fig2.suptitle('Expected Asymptotic Notation vs Running Time', fontsize=20) 
+    # fig, ax = plt.subplots(figsize=(10, 10))
+    # fig.suptitle('Expected Asymptotic Notation vs Running Time', fontsize=20) 
     ax2.set_xlabel('m + n log n', fontsize=10)
     ax2.set_ylabel('running time', fontsize=10)
-    plt.plot(x, dyn_y, marker="*", c = 'r')
-
+    line3, = ax2.plot(x, dyn_y, label="DynDijkstra", marker="*", c = 'r')
+    second_legend = ax2.legend(handles=[line3], loc='center right')
+    # plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
 
 if __name__ == "__main__":
     # PROJECT GOAL
