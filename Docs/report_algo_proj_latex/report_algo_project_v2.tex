@@ -196,7 +196,71 @@ Alla fine dell'esecuzione della funzione $DijkstraWithRandomEventTest$ verranno 
 Lo script $plotResult.py$ si occupa di leggere i file json generati dai test, manipolare tali dati e plottare i grafici opportuni che verranno discussi nel paragrafo successivo. La separazione in fasi del test enviromment ha consentito lo sviluppo e la validazione degli script senza la necessità di attendere il tempo necessario all'elaborazione degli algoritmi.
 \newpage
 \section{Risultati}
+I risultati sono stati ottenuti eseguendo gli esperimenti su un notebook con le seguenti caratteristiche hardware:
+\begin{itemize}
+\item CPU Intel Core i9-9980HK (8 Core, 16 Thread, 5Ghz)
+\item GPU NVIDIA GeForce GTX 1650 (4 GB GDDR5)
+\item RAM 16 GB DDR4 2666MHz
+\item Disco a stato solido M.2 2230/2280 (PCIe Gen3.0x4 NVMe, 32 Gb/s)
+\end{itemize}
+Al fine di quantificare l'efficienza dell'algoritmo di Dijkstra dinamico rispetto a quello statico, verranno di seguito riportati i grafici dei risultati ottenuti dai test precedentemente illustrati.
+In particolare verranno distinti i risultati ottenuti eseguendo i due algoritmi su grafi generati secondo Barabasi-Albert da Erdos-Renyi.
 
-\section{Conclusioni}
+Per prima cosa, per validare i due algoritmi, è stato confrontato il running time dei due algoritmi con la complessità nota in letteratura (in termini asintotici).
+Sono stati riportati due grafici all'interno della stessa figura. Il primo per evidenziare la differenza dei running time tra i due algoritmi. Il secondo per vedere quale andamento ha il running time dell'algoritmo dinamico, che a causa dei diversi ordini di grandezza con quello statico, non è ben comprensibile dalla prima figura.
+\begin{figure}[!h]
+\includegraphics[scale=0.29]{img/BAG_F1_ExpectedAsymptotic-RunningTime}
+\centering
+\caption{Barabasi-Albert Graph: Asymptotic Comparison}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[scale=0.29]{img/ERG_F1_ExpectedAsymptotic-RunningTime}
+\centering
+\caption{Erdos-Renyi Graph: Asymptotic Comparison}
+\end{figure}
+\newpage
+Successivamente è stato ritenuto opportuno osservare come lo speedup varia al variare del numero dei nodi del grafo. In particolare il numero dei nodi del grafo è stato scelto attraverso la tecnica del doubling experiment.
+\begin{figure}[!h]
+\includegraphics[scale=0.29]{img/BAG_F2_Nodes-Speedup}
+\centering
+\caption{Barabasi-Albert Graph: \#Nodes vs Speedup}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[scale=0.29]{img/ERG_F2_Nodes-Speedup}
+\centering
+\caption{Erdos-Renyi Graph: \#Nodes vs Speedup}
+\end{figure}
+\newpage
+Infine è stato utilizzato un modello di regressione polinomiale per stabilire l'andamento dello speedup tra i due algoritmi. Ogni punto arancione in figura rappresenta lo speedup tra i due algoritmi ad ogni evento di modifica del grafo. In particolare, per ogni taglia di grafo, sono stati eseguiti esattamente 35000 eventi riportati nell'ordine in cui si sono succeduti. 
+\begin{figure}[!h]
+\includegraphics[scale=0.29]{img/BAG_F3_Event-Speedup}
+\centering
+\caption{Barabasi-Albert Graph: event vs Speedup}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[scale=0.29]{img/ERG_F3_Event-Speedup}
+\centering
+\caption{Erdos-Renyi Graph: event vs Speedup}
+\end{figure}
+\newpage
+\section{Conclusioni e sviluppi futuri}
+Dall'analisi dei risultati ottenuti è possibile concludere, limitatamente agli
+esperimenti condotti, che:
+\begin{itemize}
+\item Lo speedup tra i due algoritmi varia dal trascurabile a tre ordini di grandezza
+\item L'algoritmo dinamico, seppur molto più veloce in determinate situazioni, presenta comunque un andamento tipico di Dijkstra che varia da sublineare a quadratico in base alla densità del grafo
+\item dalla figura 15 e 16 non vi è una differenza sufficiente per concludere che i grafi Barabasi-Albert e Erdos-Renyi influenzano l'andamento dell'algoritmo dinamico rispetto a quello statico. Nonostante ciò, si può comunque concludere che lo speedup aumenta in modo lineare all'aumentare dei nodi di un grafo purché non aumenti in modo rilevante la densità.
+\item Il numero di eventi di modifica rispetto alla grandezza del nodi del grafo ne influenza in modo significativo l'andamento. In particolare:
+- Aggiungere molti archi in un grafo piccolo fa decrescere lo speedup. A conferma del fatto che in un grafo completo lo speedup dei due algoritmi è circa uguale se non negativo (a causa del fatto che l'algoritmo dinamico avrà un'overhead dovuto all'identificazione delle variazioni).
+- Al crescere delle dimensioni dei grafi lo speedup aumenta (mediamente) come già visto in precedenza ma , dalle figure 17 e 18, emergono dati importanti circa la distribuzione degli eventi molto, poco e mediamente onerosi in termini di tempo. In particolare, ci sono eventi a causa dei quali l'algoritmo dinamico deve ricalcolare tutto esattamente come quello statico. Infatti, ci sono eventi al di sotto dello 0 nell'asse delle ascisse proprio perchè, a fronte di quell'evento, l'algoritmo dinamico è stato addirittura più lento di quello statico.
+- E' intuibile ma non dimostrabile con certezza attraverso i dati ottenuti che lo speedup crescerà fino al suo massimo teorico nel caso di un grafo completo a fronte di un singolo evento ottimo ma mediamente tenderà a scendere man mano che si ci si avvicina alle condizioni di completezza.
+\end{itemize}
+Questi risultati offrono quel minimo di dati che consentono di fare delle scelte guidate, quantificandone a priori i risultati che sarà possibile ottenere, li dove vi è l'esigenza di scegliere tra l'enorme complessità di implementazione di un algoritmo dinamico e l'accontentarsi di determinati running time a vantaggio di una complessità di implementazione minore.
 
+Eventuali sviluppi futuri potrebbero essere:
+\begin{itemize}
+\item ripetere i test con particolari e contestualizzati set di grafi
+\item parallelizzare i test su più core e/o dispositivi li dove possibile
+\item approfondire la ricerca di caratteristiche determinanti e/o correlazioni tra parametri attraverso studi workhorse mirati
+\end{itemize}
 \end{document}
