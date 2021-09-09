@@ -6,7 +6,13 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 \usepackage{listings}
+
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+
 \lstset{upquote=true}
 \graphicspath{ {./} }
 \begin{document}
@@ -17,15 +23,78 @@
 \newtheorem{definition}{Definition}[section]
 \newtheorem{theorem}{Theorem}
 \section{Introduzione}
-Al giorno d'oggi, moltissime sono le applicazioni che fanno uso intensivo di algoritmi per il calcolo di cammini minimi su grafi. Il problema principale dei grafi nelle applicazioni moderne è che cambiano la loro struttura continuamente ed in modo non predicibile a priori. Gli eventi che vanno a cambiare la struttura del grafo possono essere: aggiunta o rimozione di nodi e/o archi e incrementi/decrementi dei pesi degli archi.
-L'obiettivo di questo studio è quello di andare a valutare le performance di due algoritmi per il calcolo dei cammini minimi di un grafo a fronte di eventi di aggiunta di archi ed incremento dei pesi degli archi.
+Al giorno d'oggi, moltissime sono le applicazioni che fanno uso intensivo di algoritmi per la risoluzione del problema del calcolo dei cammini minimi da singola sorgente.
+In particolare, il Single Source Shortest Path problem (SSSP) consiste nel trovare i cammini minimi tra un dato vertice sorgente u e tutti gli altri vertici nel grafo.
+L'algoritmo di Dijkstra è un algoritmo esatto che risolve tale problema. Per algoritmo esatto si intende quell'algoritmo che restituisce soluzioni ottime per il problema dato.
+In alcune applicazioni moderne, uno dei principali problemi è che i grafi cambiano continuamente la loro struttura ed in modo non predicibile a priori. In particolare gli eventi che vanno a cambiare la struttura del grafo possono essere: aggiunta o rimozione di nodi e/o archi e incrementi/decrementi dei pesi degli archi. Al verificarsi di ogni evento, i cammini minimi calcolati precedentemente potrebbero non essere più minimi, rendendo così necessaria un ulteriore risoluzione del problema.
+L'obiettivo di questo studio è quello di andare a valutare le performance di due algoritmi, per il calcolo dei cammini minimi di un grafo da singola sorgente, a fronte di eventi di aggiunta di archi ed incremento dei pesi degli archi.
 I due algoritmi presi in esame sono quelli messi a disposizione dal toolkit Networkit nella libreria distance, in particolare: distance.Dijkstra e distance.DynDijkstra.
-\subsection{DynDijkstra}
+\subsection{Notazione}
+Sia $G=(V,E)$ un grafo e siano
+\begin{itemize}
+\item $V = {v_1, \dots, v_n}$ insieme finito di vertici 
+\item $E = {(v_i, v_j): v_i, v_j \in V}$ insieme finito di archi
+\item $|V| = n$
+\item $|E| = m$
+\end{itemize}
+Definiamo:
+\begin{itemize}
+\item $w:E \rightarrow R$ funzione peso di $G = (V, E)$
+\item peso di un cammino $\prod=<v_1, \dots, v_k>$ come somma dei pesi degli archi che lo costituiscono, cioè: $w(\prod)=\sum_{i=1}^k w(v_{i-1}, v_i)$
+\item peso di un cammino minimo da un vertice $u$ a un vertice $v$ come: 
+$d(u,v) = 
+\begin{cases}
+min\{ w(\prod):u \rightarrow v\}$ \quad Se esiste un cammino da $u$ a $v\\
+\infty $ \quad Altrimenti$
+\end{cases}
+$
+\item cammino minimo da un vertice $u$ a un vertice $v$ come un qualunque cammino $\prod$ il cui peso è pari a $d(u, v)$
+\item albero dei cammini minimi con radice in $s$ il
+sottografo $G' = (V', E')$, con $V'\subseteq V$ ed $E'\subseteq E$, tale che
+\begin{itemize}
+\item $V'$ è l'insieme dei vertici raggiungibili da $s$
+\item $G'$ è un albero con radice in $s$
+\item Per ogni $v \in V'$. l'unico cammino da $s$ a $v$ in $G'$ è un cammino minimo da $s$ a $v$ in $G$
+\end{itemize}
+\end{itemize}
+
+\subsection{Algoritmo DynDijkstra}
 L'algoritmo DynDijkstra, dato un grafo e un evento, permette di calcolare i cammini minimi da un nodo sorgente andando a ricalcolare solo i cammini che sono stati influenzati dall'evento.
-\subsection{Dijkstra}
-L'algoritmo Dijkstra, dato un grafo, permette di calcolare i cammini minimi da un nodo sorgente.
-Al contrario del precedente appena descritto è intuibile che ,a fronte di tali eventi, è necessario rieseguirlo per avere i cammini minimi corretti ed aggiornati. 
+\subsection{Algoritmo di Dijkstra}
+L'algoritmo di Dijkstra consente di risolvere il problema del Single-Source Shortest Path. É applicabile in grafi diretti e non, con o senza cicli, pesati o non pesati purché abbiano archi con pesi non negativi.
+L'algoritmo Dijkstra, dato in input un grafo $G=(V,E,w)$ orientato o non orientato e con pesi reali non negativi sugli archi ed un vertice sorgente $s$, permette di calcolare l'albero dei cammini minimi $G'$ con radice in $s$ e per ogni vertice $v$ il valore $d(s,v)$
+\subsubsection{Pseudocodice}
+
+\begin{algorithm}
+\caption{$Dijkstra\,(grafo\; G, vertice\; s) \rightarrow albero\; G'$}\label{euclid}
+\begin{algorithmic}[1]
+\ForEach {$vertice\; u \in G$}
+\State $d_{su} \gets +\infty$
+\EndFor
+\State $\textit{CodaConPriorità S}$
+\State $G' \gets \textit{albero formato dal solo vertice s}$
+\State $d_{ss} \gets 0$
+\State $S.Insert(s,0)$
+\While{$(not \; S.IsEmpty())$}
+\State $u \gets S.DeleteMin()$
+\ForEach{$(arco \; (u,v)\in G)$}
+\If{$(d_{sv}= +\infty)$}
+\State $S.Insert(v, d_{su}+w(u,v))$
+\State $d_{sv} \gets d_{su}+w(u,v)$
+\State $\textit{Rendi u padre di v in G'}$
+\ElsIf{$(d_{su} + w(u,v)<d_{sv})$}
+\State $S.DecreaseKey(v, d_{sv}-(d_{su} + w(u,v))$
+\State $d_{sv} \gets d_{su}+w(u,v)$
+\State $\textit{Rendi u nuovo padre di v in G'}$
+\EndIf
+\EndFor
+\EndWhile
+\Return {$G'$}
+\end{algorithmic}
+\end{algorithm}
+Al contrario del precedente appena descritto è intuibile che, a fronte di tali eventi, è necessario rieseguirlo per avere i cammini minimi corretti ed aggiornati. 
 Pertanto, tale algoritmo è stato utilizzato per quantificare quanto fosse più veloce l'algoritmo dinamico in particolari set di grafi.
+\newpage
 \section{Progettazione degli esperimenti}
 Con questo studio si vuole determinare come varia lo speedup tra l'algoritmo statico e quello dinamico al variare delle taglie dei grafi in input, pertanto per la scelta dei fattori e dei design points si è fatto riferimento alle linee guida relative alle categorie di domande di tipo Assessment.
 Di seguito verranno brevemente riportate le metriche ed i parametri scelti:

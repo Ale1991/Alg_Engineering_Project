@@ -4,34 +4,38 @@
 \babel@aux{italian}{}
 \babel@aux{italian}{}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduzione}{1}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}DynDijkstra}{1}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Dijkstra}{1}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2}Progettazione degli esperimenti}{1}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3}Test Environment}{2}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Test Enviroment Workflow}}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Implementazioni}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}Phase 1 Graph Generation}{4}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Phase 1: cmd to graphFiles}}{4}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2}Phase 2 Graph Deserialize}{5}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Phase 2: graphFiles to graphParser}}{5}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3}Phase 3 Run Test Dijkstra Algorithms}{6}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Phase 3: graphParser to testDijkstra}}{6}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces test\_DijkstraOnGraphByType function}}{6}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces DijkstraWithRandomEventTest function}}{7}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces DijkstraWithRandomEventTest function}}{8}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces handleEdgeAdditionEvent function}}{9}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces running time with logger in DEBUG mode}}{10}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces running time with logger in INFO mode}}{10}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4}Phase 4 Serialize Test Data}{11}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Phase 4: testDijkstra to resultFiles}}{11}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.5}Phase 5 Plot Results}{12}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Phase 5: resultFiles to plots}}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4}Risultati}{13}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Barabasi-Albert Graph: Asymptotic Comparison}}{13}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Erdos-Renyi Graph: Asymptotic Comparison}}{14}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Barabasi-Albert Graph: \#Nodes vs Speedup}}{14}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Erdos-Renyi Graph: \#Nodes vs Speedup}}{15}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Barabasi-Albert Graph: event vs Speedup}}{15}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces Erdos-Renyi Graph: event vs Speedup}}{16}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusioni e sviluppi futuri}{16}{}\protected@file@percent }
-\gdef \@abspage@last{17}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Notazione}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Algoritmo DynDijkstra}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Algoritmo di Dijkstra}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.1}Pseudocodice}{2}{}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces $Dijkstra\,(grafo\tmspace  +\thickmuskip {.2777em} G, vertice\tmspace  +\thickmuskip {.2777em} s) \rightarrow albero\tmspace  +\thickmuskip {.2777em} G'$}}{3}{}\protected@file@percent }
+\newlabel{euclid}{{1}{3}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Progettazione degli esperimenti}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Test Environment}{4}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Test Enviroment Workflow}}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Implementazioni}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}Phase 1 Graph Generation}{6}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Phase 1: cmd to graphFiles}}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2}Phase 2 Graph Deserialize}{7}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Phase 2: graphFiles to graphParser}}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3}Phase 3 Run Test Dijkstra Algorithms}{8}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Phase 3: graphParser to testDijkstra}}{8}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces test\_DijkstraOnGraphByType function}}{8}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces DijkstraWithRandomEventTest function}}{9}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces DijkstraWithRandomEventTest function}}{10}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces handleEdgeAdditionEvent function}}{11}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces running time with logger in DEBUG mode}}{12}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces running time with logger in INFO mode}}{12}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4}Phase 4 Serialize Test Data}{13}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Phase 4: testDijkstra to resultFiles}}{13}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.5}Phase 5 Plot Results}{14}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Phase 5: resultFiles to plots}}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Risultati}{15}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Barabasi-Albert Graph: Asymptotic Comparison}}{15}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Erdos-Renyi Graph: Asymptotic Comparison}}{16}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Barabasi-Albert Graph: \#Nodes vs Speedup}}{16}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Erdos-Renyi Graph: \#Nodes vs Speedup}}{17}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Barabasi-Albert Graph: event vs Speedup}}{17}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces Erdos-Renyi Graph: event vs Speedup}}{18}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusioni e sviluppi futuri}{18}{}\protected@file@percent }
+\gdef \@abspage@last{19}
