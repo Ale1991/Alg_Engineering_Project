@@ -9,6 +9,7 @@
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 \usepackage{listings}
+\usepackage{float}
 
 \algnewcommand\algorithmicforeach{\textbf{for each}}
 \algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
@@ -24,7 +25,7 @@
 \newtheorem{theorem}{Theorem}
 \section{Introduzione}
 Al giorno d'oggi, moltissime sono le applicazioni che fanno uso intensivo di algoritmi per la risoluzione del problema del calcolo dei cammini minimi da singola sorgente.
-In particolare, il Single Source Shortest Path problem (SSSP) consiste nel trovare i cammini minimi tra un dato vertice sorgente u e tutti gli altri vertici nel grafo.
+In particolare, il Single Source Shortest Path problem (SSSP) consiste nel trovare i cammini minimi tra un dato vertice sorgente $s$ e tutti gli altri vertici nel grafo.
 L'algoritmo di Dijkstra è un algoritmo esatto che risolve tale problema. Per algoritmo esatto si intende quell'algoritmo che restituisce soluzioni ottime per il problema dato.
 In alcune applicazioni moderne, uno dei principali problemi è che i grafi cambiano continuamente la loro struttura ed in modo non predicibile a priori. In particolare gli eventi che vanno a cambiare la struttura del grafo possono essere: aggiunta o rimozione di nodi e/o archi e incrementi/decrementi dei pesi degli archi. Al verificarsi di ogni evento, i cammini minimi calcolati precedentemente potrebbero non essere più minimi, rendendo così necessaria un ulteriore risoluzione del problema.
 L'obiettivo di questo studio è quello di andare a valutare le performance di due algoritmi, per il calcolo dei cammini minimi di un grafo da singola sorgente, a fronte di eventi di aggiunta di archi ed incremento dei pesi degli archi.
@@ -55,17 +56,65 @@ sottografo $G' = (V', E')$, con $V'\subseteq V$ ed $E'\subseteq E$, tale che
 \item $V'$ è l'insieme dei vertici raggiungibili da $s$
 \item $G'$ è un albero con radice in $s$
 \item Per ogni $v \in V'$. l'unico cammino da $s$ a $v$ in $G'$ è un cammino minimo da $s$ a $v$ in $G$
+\item con $w$ si fa riferimento a quei nodi la cui distanza da $s$ è cambiata come conseguenza degli eventi nel batch $\beta$
+\item $p(w):=$ priorità del nodo $w$
+\item $d:=$ vettore delle distanze da $s$
+\item $\sigma$ vettore dei cammini minimi da $s$
+\item $d' = max \{d(s,u) | u\in V, d(u,v) \neq +\infty \}$
+\item $d'' = max \{d(s,v) | v\in V, v \neq u,d(s,v) \neq +\infty \}$
 \end{itemize}
 \end{itemize}
-
+\newpage
 \subsection{Algoritmo DynDijkstra}
-L'algoritmo DynDijkstra, dato un grafo e un evento, permette di calcolare i cammini minimi da un nodo sorgente andando a ricalcolare solo i cammini che sono stati influenzati dall'evento.
+L'algoritmo DynDijkstra, dato un grafo $G$ e un batch di eventi $\beta$, permette di mantenere aggiornato l'albero dei cammini minimi, radicato in $s$, andando a ricalcolare solo i cammini che sono stati influenzati dagli eventi in $\beta$. Tale aggiornamento viene effettuato attraverso l'algoritmo $updateSSSP$ illustrato nel seguito. Per completezza si sottolinea che l'algoritmo DynDijkstra fa uso dell'algoritmo di Dijkstra per il calcolo dell'albero dei cammini minimi nella sua prima iterazione.
+\subsubsection{Pseudocodice} 
+\begin{algorithm}[H]
+\caption{$updateSSSP(grafo\, G, vettore \, d, vettore \, \sigma, batch \, \beta) \rightarrow \{ updated \, d(v), updated \, \sigma (v) \; \forall v \in V\}$}
+\label{euclid}
+\begin{algorithmic}[1]
+\State $CodaConPriorita\; S$
+\ForEach {$arco\; e \in \beta, d(u)<d(v)$}
+\State $S.InsertOrDecreaseKey(v, p(v)= min\{d(u)+w(u,v), d(w)\}$
+\EndFor
+\State $\overline{w} \gets min\{\overline{w}, w(e) \in \beta \}$
+\While{$(not \; S.IsEmpty())$}
+\State $\{w, p(w)\} \gets S.ExtractMin()$
+\State $con(w) \gets min_{z:(z,w) \in E} d(z) + w(z,w)$
+\If{$(con(w)=p(w))$}
+\State $update \; d' \; and \; d''$
+\State $d(w)\gets p(w)$
+\State $\sigma (w)\gets 0$
+\ForEach {$incident \; edge \; (z,w)$}
+\If{$d(w) = d(z)+w(z,w) $}
+\State  $\sigma(w)\gets \sigma(w)+\sigma (z) $
+\EndIf
+\If{$d(z) \ge d(w)+w(z,w) $}
+\State $S.InsertOrDecreaseKey(z, p(z)= d(w)+w(z,w))$
+\EndIf 
+\EndFor
+\Else
+\If{$(d(w) \neq +\infty)$}
+\If{$(con(w) \neq +\infty$}
+\State $S.InsertOrDecreaseKey(w, p(w)= con(w))$
+\ForEach {$incident \; edge \; (z,w)$}
+\If{$d(z) = d(w)+w(w,z)$}
+\State $S.InsertOrDecreaseKey(z, p(z)= d(w)+w(z,w))$
+\EndIf
+\EndFor
+\State $d(w)\gets +\infty$
+\EndIf
+\EndIf
+\EndIf
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+\newpage
 \subsection{Algoritmo di Dijkstra}
 L'algoritmo di Dijkstra consente di risolvere il problema del Single-Source Shortest Path. É applicabile in grafi diretti e non, con o senza cicli, pesati o non pesati purché abbiano archi con pesi non negativi.
-L'algoritmo Dijkstra, dato in input un grafo $G=(V,E,w)$ orientato o non orientato e con pesi reali non negativi sugli archi ed un vertice sorgente $s$, permette di calcolare l'albero dei cammini minimi $G'$ con radice in $s$ e per ogni vertice $v$ il valore $d(s,v)$
+L'algoritmo Dijkstra, dato in input un grafo $G=(V,E,w)$ orientato o non orientato e con pesi reali non negativi sugli archi ed un vertice sorgente $s$, permette di calcolare l'albero dei cammini minimi $G'$ con radice in $s$ e per ogni vertice $v$ il valore $d(s,v)$. Al contrario del precedente appena descritto è intuibile che, a fronte di tali eventi, è necessario rieseguirlo per avere i cammini minimi corretti ed aggiornati. 
+Pertanto, tale algoritmo è stato utilizzato per quantificare quanto fosse più veloce l'algoritmo dinamico in particolari set di grafi.
 \subsubsection{Pseudocodice}
-
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{$Dijkstra\,(grafo\; G, vertice\; s) \rightarrow albero\; G'$}\label{euclid}
 \begin{algorithmic}[1]
 \ForEach {$vertice\; u \in G$}
@@ -92,8 +141,6 @@ L'algoritmo Dijkstra, dato in input un grafo $G=(V,E,w)$ orientato o non orienta
 \Return {$G'$}
 \end{algorithmic}
 \end{algorithm}
-Al contrario del precedente appena descritto è intuibile che, a fronte di tali eventi, è necessario rieseguirlo per avere i cammini minimi corretti ed aggiornati. 
-Pertanto, tale algoritmo è stato utilizzato per quantificare quanto fosse più veloce l'algoritmo dinamico in particolari set di grafi.
 \newpage
 \section{Progettazione degli esperimenti}
 Con questo studio si vuole determinare come varia lo speedup tra l'algoritmo statico e quello dinamico al variare delle taglie dei grafi in input, pertanto per la scelta dei fattori e dei design points si è fatto riferimento alle linee guida relative alle categorie di domande di tipo Assessment.
